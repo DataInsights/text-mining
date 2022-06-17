@@ -1,0 +1,13 @@
+delete_merged_file: true
+language:
+  ui:
+    chapter_name: ""
+book_filename: "flyer_template"
+output_dir:
+
+rmd_files: [
+"index.Rmd",
+# "flyer.Rmd",
+# "99_appendix.Rmd",
+# "999-references.Rmd"
+]

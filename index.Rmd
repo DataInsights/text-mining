@@ -1,0 +1,103 @@
+---
+title: "NGS writers to review primary papers and provide a 1 pager flyer / review of the paper."
+subtitle: "Single-Cell RNA-Sequencing Atlas Reveals an MDK-Dependent Immunosuppressive Environment in ErbB Pathway-Mutated Gallbladder Cancer"
+date: "This report was updated on `r Sys.Date()`"
+site: bookdown::bookdown_site
+knit: bookdown::render_book
+css:
+- style.css
+- toc.css
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+  # html_document:
+  # pdf_document:
+  # word_document:
+  bookdown::bs4_book:
+    template: bs4_text_mining_template.html
+    toc_depth: 6
+    favicon: "favicon.ico"
+    footnotes_inline: false
+    split_bib: false
+    repo:
+      base: https://github.com/DataInsights/text-mining/
+      branch: main
+      # subdir: book
+      icon: "fas fa-air-freshener"
+    theme:
+      fg: "black"
+      bg: "#FFFEFA"
+      primary: "#277DB0"
+      secondary: "#277DB0"
+      success: "#277DB0"
+      info: "#277DB0"
+      warning: "#277DB0"
+      danger: "#277DB0"
+      base_font:
+        google: Sen
+      heading_font:
+        google:
+          family: Bitter
+          wght: 300
+      code_font:
+        google:
+          # arguments to sass::font_google()
+          family: DM Mono
+          local: false
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+
+```
+
+# Article Summarization
+
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Introduction
+
+```{r}
+
+```
+
+### Strategy
+
+```{r}
+
+```
+
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+### Strategy cont...
+
+
+### Results
+
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Results cont...
+
+```{r}
+
+```
+
+
+### Conclusion
+
+```{r}
+
+```
+
+### References
+
+```{r}
+
+```
+
