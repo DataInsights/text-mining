@@ -7,6 +7,8 @@ output_dir:
 
 rmd_files: [
 "index.Rmd",
+"01_ngs_gbc_article.Rmd",
+"02_flex_dashboard.Rmd",
 # "charles.Rmd",
 # "flyer.Rmd",
 # "99_appendix.Rmd",

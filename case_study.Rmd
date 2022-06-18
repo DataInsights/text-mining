@@ -1,0 +1,379 @@
+--- 
+title: "NGS Article Summarization"
+author: "Client: Charles Thomson via Kolabtree"
+description: "One pager flyer and review summary"
+date:  "Updated: `r Sys.Date()`"
+output:
+  html_document:
+    css: ngs-flyer/style.css
+    keep_md: true
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+  pdf_document:
+    fig_caption: true
+    keep_tex: true
+    latex_engine: xelatex
+    toc: false
+    toc_depth: 2
+    df_print: kable
+  includes:
+    in_header: 
+    - Global/header.tex
+  word_document:
+    toc: true
+    toc_depth: 2
+bibliography: [ngs-flyer/library.bib]
+citation_package:
+- natbib
+- biblatex
+- amsplain
+colorlinks: true
+css: style.css
+always_allow_html: true
+fig_caption: true
+fontsize: 12pt
+geometry: margin=1in
+indent: false
+keep_tex: true
+link-citations: true
+mainfont: Times New Roman
+biblio-style: apalike
+spacing: double
+header-includes: 
+- \renewcommand{\abstractname}{Executive Summary}
+- \usepackage{setspace}
+- \newpage
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+---
+title: "NGS Article Summarization"
+author: 'Client: Charles Thomson via Kolabtree'
+date: "6/15/2022"
+output:
+  pdf_document: default
+  word_document: default
+always_allow_html: yes
+---
+
+# General Setup
+```{r message=FALSE, warning=FALSE}
+options(stringsAsFactors = F)          # no automatic data transformation
+options("scipen" = 100, "digits" = 12) # suppress math annotation
+
+source(file = "ngs-flyer/R/common.R")
+if(!require("xml2")) {install.packages("xml2")}
+library(xml2)
+if(!require("rvest")) {install.packages("rvest")}
+library(rvest)
+if(!require("lexRankr")) {install.packages("lexRankr")}
+library(lexRankr)
+if(!require("textmineR")) {install.packages("textmineR")}
+library(textmineR)
+if(!require("tidyverse")) {install.packages("tidyverse")}
+library(tidyverse, suppressPackageStartupMessages())
+if(!require("quanteda")) {install.packages("quanteda")}
+library(quanteda)
+if(!require("igraph")) {install.packages("igraph")}
+library(igraph)
+if(!require("here")) {install.packages("here")}
+library(here)
+if(!require("remotes")) {install.packages("remotes")}
+library(remotes)
+if(!require("klippy")) {remotes::install_github("rlesur/klippy")}
+library(klippy)
+
+klippy::klippy()
+```
+
+
+# Text summarization
+
+## Path to article
+```{r}
+url = "https://complexdatainsights.com/projects/ngs-flyer/pmid_34171432.html"
+```
+
+## Extract sentences
+```{r eval=FALSE, include=FALSE}
+# read page html
+page = xml2::read_html(url)
+# page = xml2::read_html(url)
+
+# extract text from page html using selector
+page %>%
+  # extract paragraphs
+  rvest::html_nodes("p") %>%
+  # extract text
+  rvest::html_text() %>%
+  # remove empty elements
+  .[. != ""] -> text
+# inspect data
+head(text, 2)
+
+```
+
+## Full article
+```{r}
+text <- read_delim("ngs-flyer/docs/pmid_34171432.txt", delim = "\n", show_col_types = F) %>% as.character()
+full  <- lexRankr::lexRank(text,
+                docId = rep(1, length(text)),
+                n = 5,
+                continuous = TRUE) %>%
+  
+dplyr::mutate(sentenceId = as.numeric(stringr::str_remove_all(sentenceId, ".*_"))) %>%
+mutate(value =  round(100 * value, digits = 4)) %>% 
+select(value, sentence) %>% 
+dplyr::arrange(-value)
+```
+
+
+## Abstrcat
+```{r}
+text <- "Epithelial subtype 1, 2 and 3 were mainly found in the adenocarcinoma and subtype 4 was present in adenosquamous carcinoma.
+Tumors with ErbB pathway mutations harbored a larger population of subtype 1 and 2 epithelial cells, Tregs, and M2 macrophages.
+Increased MDK in these tumors interacted with its receptor LRP1 to promote immunosuppressive macrophage differentiation.
+Crosstalk between macrophage-secreted CXCL10 and its receptor CXCR3 on Tregs was induced in GBC with ErbB pathway mutations.
+
+Background & Aims
+Our previous genomic whole-exome sequencing (WES) data identified the key ErbB pathway mutations that play an essential role in regulating the malignancy of gallbladder cancer (GBC). Herein, we tested the hypothesis that individual cellular components of the tumor microenvironment (TME) in GBC function differentially to participate in ErbB pathway mutation-dependent tumor progression.
+
+Methods
+We engaged single-cell RNA-sequencing to reveal transcriptomic heterogeneity and intercellular crosstalk from 13 human GBCs and adjacent normal tissues. In addition, we performed WES analysis to reveal the genomic variations related to tumor malignancy. A variety of bulk RNA-sequencing, immunohistochemical staining, immunofluorescence staining and functional experiments were employed to study the difference between tissues with or without ErbB pathway mutations.
+
+We identified 16 cell types from a total of 114,927 cells, in which epithelial cells, M2 macrophages, and regulatory T cells were predominant in tumors with ErbB pathway mutations. Furthermore, epithelial cell subtype 1, 2 and 3 were mainly found in adenocarcinoma and subtype 4 was present in adenosquamous carcinoma. The tumors with ErbB pathway mutations harbored larger populations of epithelial cell subtype 1 and 2, and expressed higher levels of secreted midkine (MDK) than tumors without ErbB pathway mutations. Increased MDK resulted in an interaction with its receptor LRP1, which is expressed by tumor-infiltrating macrophages, and promoted immunosuppressive macrophage differentiation. Moreover, the crosstalk between macrophage-secreted CXCL10 and its receptor CXCR3 on regulatory T cells was induced in GBC with ErbB pathway mutations. Elevated MDK was correlated with poor overall survival in patients with GBC.
+
+This study has provided valuable insights into transcriptomic heterogeneity and the global cellular network in the TME, which coordinately functions to promote the progression of GBC with ErbB pathway mutations; thus, unveiling novel cellular and molecular targets for cancer therapy.
+
+We employed single-cell RNA-sequencing and functional assays to uncover the transcriptomic heterogeneity and intercellular crosstalk present in gallbladder cancer. We found that ErbB pathway mutations reduced anti-cancer immunity and led to cancer development. ErbB pathway mutations resulted in immunosuppressive macrophage differentiation and regulatory T cell activation, explaining the reduced anti-cancer immunity and worse overall survival observed in patients with these mutations.
+Graphical abstract
+Figure thumbnail ga1
+View Large ImageFigure ViewerDownload Hi-res imageDownload (PPT)
+"
+  
+abstract  <- lexRankr::lexRank(text,
+                docId = rep(1, length(text)),
+                n = 3,
+                continuous = TRUE) %>%
+dplyr::mutate(sentenceId = as.numeric(stringr::str_remove_all(sentenceId, ".*_"))) %>%
+mutate(value =  round(100 * value, digits = 4),
+       section = "abstract") %>% 
+select(section, value, sentence) %>% 
+dplyr::arrange(-value)
+
+```
+
+## Introduction
+```{r}
+text <- "Introduction
+Gallbladder carcinoma (GBC) is the most common cancer of the biliary tract and the sixth most common type of gastrointestinal cancer worldwide.[1],[2] Gallbladder adenocarcinoma (AC) accounts for more than 85% of GBCs, which are characterized by high intra-tumoral heterogeneity and poor prognosis, whereas adenosquamous carcinoma (ASC: <5%) and squamous carcinoma (<2%) constitute a small proportion of GBCs, for which there is insufficient research information available to guide treatment.[3],[4] Even though surgical treatment is commonly used for GBC, the population amenable to surgical treatment is limited, as most patients are diagnosed at advanced stages. The median survival of patients with GBC in general is less than 1 year, highlighting the extremely poor prognosis associated with this condition.4,  5,  6,  7 Given GBCs are sophisticated ecosystems characterized by spatiotemporal interactions between heterogeneous cell types, such as malignant cells and stromal cells in the tumor microenvironment (TME), their heterogeneity has evidently dampened the efficacy of anti-tumor treatments that target single specific cells and/or molecules but not multiple key elements simultaneously.8,  9,  10,  11,  12,  13,  14,  15 Therefore, it is worthwhile to globally understand cellular heterogeneity and the intimate interactions underpinning tumor malignancy in order to develop new therapeutic approaches to improve treatment.
+Oncogenesis is a chronic, multistep pathogenesis that involves a number of genetic and epigenetic alterations. Growing evidence suggests that genomic alterations acquired during oncogenesis help tumor cells to escape immune surveillance.[2] In our previous studies, we performed whole-exome sequencing (WES) in a larger number of patients with GBC and identified that ErbB signaling is the most extensively mutated pathway that mediates anti-tumor immunity, and elevated ErbB-mutation levels are correlated with a worse outcome in patients with GBC.[2],[16] However, these studies generally relied on data from bulk tumor profiling, limiting their ability to accurately decipher tumor heterogeneity and genomic variations between individual cells, which are expected to contribute to tumor transformation and poor prognosis.
+The emergence of single-cell RNA-sequencing (scRNA-seq) approaches has allowed us to visualize expression profiling of specific cell populations.17,  18,  19,  20,  21,  22,  23 In particular, clinical application of the scRNA-seq on tumor biopsies has helped establish a new immunotherapeutic strategy based on the genetic alterations identified in immune cells.24,  25,  26,  27,  28,  29,  30 Of note, the advanced technology of newly developed data sets has greatly improved our understanding of the mechanisms that regulate intercellular interactions between tumor cells and stromal cells at the single-cell level.[31],[32] To reveal intra-tumoral cellular heterogeneity and intercellular crosstalk associated with genetic signatures, we took advantage of the newly created scRNA-seq technology to investigate genetic variations in paired primary GBC tumors and adjacent normal tissues. Herein, we present unprecedentedly large-scale transcriptomic data on GBC, unveiling the altered genetic properties of individual tumor cells and immune cells that cooperate to drive malignant transformation, and providing a valuable resource for future research.
+Patients and methods
+
+Human GBC samples
+Eleven patients were pathologically diagnosed with gallbladder AC, and 2 were diagnosed with ASC at Xinhua Hospital, Shanghai Jiao Tong University School of Medicine (Fig. 1A). The available clinicopathological features of these patients were summarized in Table S1, and these tissue samples were designated as the discovery cohort. Formalin-fixed paraffin-embedded tissue blocks from 41 patients with AC and 11 with ASC were retrospectively collected and comprised the validation cohort (Fig. 1B, Table S2), which was derived from the previously enrolled WES study cohort.[2] All patients had accepted the informed consent forms, and the study was approved by the Research and Ethics Committee of Xinhua Hospital (No. XHEC-D-2018-050).
+Figure thumbnail gr1"
+  
+intro  <- lexRankr::lexRank(text,
+                docId = rep(1, length(text)),
+                n = 3,
+                continuous = TRUE) %>%
+dplyr::mutate(sentenceId = as.numeric(stringr::str_remove_all(sentenceId, ".*_"))) %>%
+       mutate(value =  round(100 * value, digits = 4),
+              section = "intro") %>% 
+       select(section, value, sentence) %>% 
+dplyr::arrange(-value)
+
+```
+
+## Research and Sequencing Strategy
+```{r}
+text <- "We engaged single-cell RNA-sequencing to reveal transcriptomic heterogeneity and intercellular crosstalk from 13 human GBCs and adjacent normal tissues. In addition, we performed WES analysis to reveal the genomic variations related to tumor malignancy. A variety of bulk RNA-sequencing, immunohistochemical staining, immunofluorescence staining and functional experiments were employed to study the difference between tissues with or without ErbB pathway mutations.
+Eleven patients were pathologically diagnosed with gallbladder AC, and 2 were diagnosed with ASC at Xinhua Hospital, Shanghai Jiao Tong University School of Medicine (Fig. 1A). The available clinicopathological features of these patients were summarized in Table S1, and these tissue samples were designated as the discovery cohort. Formalin-fixed paraffin-embedded tissue blocks from 41 patients with AC and 11 with ASC were retrospectively collected and comprised the validation cohort (Fig. 1B, Table S2), which was derived from the previously enrolled WES study cohort.[2] All patients had accepted the informed consent forms, and the study was approved by the Research and Ethics Committee of Xinhua Hospital (No. XHEC-D-2018-050).(A–B) Workflow of experimental strategy. The discovery cohort was shown in (A), where collecting and processing fresh biopsy samples from 13 primary GBC tumors and adjacent normal tissues for scRNA-seq, bulk RNA-seq and WES analysis were briefly illustrated. The validation cohort was shown in (B). (C) The UMAP plot showing 16 cell types, patient origin, and tumor or adjacent normal tissue origin. (D) Dot plot showing the expression levels of marker genes in each cell type. (E) The bar chart showed the proportion of 13 GBCs in each cell type. (F) Heatmap displaying the relative enrichment of each cell type in cancer and adjacent normal tissues of 13 GBCs. AC, adenocarcinoma; ASC, adenosquamous carcinoma; CAF, cancer-associated fibroblast; DC, dendritic cell; GBC, gallbladder cancer; IF, immunofluorescence; IHC, immunohistochemistry; scRNA-seq, single-cell RNA sequencing; Treg, regulatory T cell; UMAP, uniform manifold approximation and projection; WES, whole-exome sequencing. (This figure appears in color on the web.)"
+
+## Rank sentences
+methods <- lexRankr::lexRank(text,
+                  docId = rep(1, length(text)),
+                  n = 10,
+                  continuous = TRUE) %>%
+  dplyr::mutate(sentenceId = as.numeric(stringr::str_remove_all(sentenceId, ".*_"))) %>%
+       mutate(value =  round(100 * value, digits = 4),
+              section = "methods") %>% 
+       select(section, value, sentence) %>% 
+  dplyr::arrange(-value)
+```
+
+```{r}
+library(DiagrammeR)
+library(DiagrammeRsvg)
+
+graph <- DiagrammeR::grViz("
+digraph {
+graph [layout = dot, rankdir = TD]
+
+node [
+shape = box, 
+style = filled, 
+fillcolor = white, 
+fontname = Helvetica,
+penwidth = 2.0] 
+
+edge [arrowhead = diamond]
+
+# We engaged single-cell RNA-sequencing to reveal transcriptomic heterogeneity and intercellular crosstalk from 13 human GBCs and adjacent normal tissues. In addition, we performed WES analysis to reveal the genomic variations related to tumor malignancy. A variety of bulk RNA-sequencing, immunohistochemical staining, immunofluorescence staining and functional experiments were employed to study the difference between tissues with or without ErbB pathway mutations.
+
+A [label = 'TAXONOMIC \nPROFILING FROM \nMICROBIOME DATA', fillcolor = white, penwidth = 5.0]
+B [label = 'Complex Data from \nSequencing Platforms\n(*.fastq.gz)', shape = folder]
+C [label = '16S rRNA Gene Amplicon\nSequencing Data']
+D [label = 'Metagenomics Shotgun\nSequencing Data']
+E [label = 'Mothur\nPipeline', shape = oval]
+F [label = 'QIIME2\nPipeline', shape = oval]
+G [label = 'MetaPhlAn\nPipeline', shape = oval]
+H [label = 'HUMAnN\nPipeline', shape = oval]
+I [label = 'ASV/OTU &\nTaxonomy Tables']
+J [label = 'Feature & Taxonomy\nTables']
+K [label = 'Microbial\nProfiles']
+L [label = 'MetaPhlAn\nBugs List']
+M [label = 'Processing Mothur, QIIME2,\nMetaPhlAn & HUMAnN Output', shape = oval, penwidth = 2.0]
+N [label = 'TIDY OTU & \nTAXONOMY\nTABLES',fillcolor = yellow, penwidth = 5.0]
+
+# A [color = black]
+# C,E,F,I,J [color = limegreen]
+# D,G,H,K,L [color = dodgerblue]
+
+{A}  -> B
+{B}  -> C
+{B}  -> D
+{C}  -> E
+{C}  -> F
+{D}  -> G
+{D}  -> H
+{E}  -> I
+{F}  -> J
+{G}  -> K
+{H}  -> L
+{I}  -> M [arrowhead = vee]
+{J}  -> M [arrowhead = vee]
+{K}  -> M [arrowhead = vee]
+{L}  -> M [arrowhead = vee]
+{M}  -> N 
+
+
+}", height = 500, width = 500)
+
+graph
+
+# 2. Convert to SVG, then save as png
+strategy = DiagrammeRsvg::export_svg(graph)
+strategy = charToRaw(strategy) # flatten
+rsvg::rsvg_png(strategy, "ngs-flyer/img/strategy.png")
+```
+
+## Results 
+```{r}
+text <- "Tumor heterogeneity in patients with GBC
+To explore the intra-tumoral and inter-tumoral heterogeneity and cellular diversity in patients with GBC, we generated scRNA-seq profiles from 13 primary tumors and 13 matched adjacent normal tissues without any previous treatment (Fig. 1A). In a separate study, the validation cohort included 41 patients with AC and 11 with ASC for tissue staining (Fig. 1B). We obtained single-cell transcriptomes of 114,927 cells in which 57,607 cells (50.1%) were from primary tumors and 57,320 cells (49.9%) were from matching adjacent normal tissues (Fig. 1C, Table S3). To define the cellular composition in the TME and subpopulation structure of GBC, we performed graph-based clustering analysis on these cells and identified 16 distinct cell types based on known marker genes or specific genes expressed by each cell type, including epithelial cell, endothelial cell_VWF, endothelial cell_DCN, myofibroblast, cancer-associated fibroblast (CAF)_MFAP5, CAF_ACTA2, mast cell, follicular B cell, plasma B cell, Treg, CD4+ T cell, CD8+ T cell, monocyte-like cell, M1 macrophage, M2 macrophage and dendritic cell (Fig. 1C, D, Table S4). Through correlation analysis between conventional bulk RNA-seq and scRNA-seq for each tissue, except GBC5, GBC10, GBC11, GBC12 and GBC13 patients due to lack of sufficient tissue, we found that the scRNA-seq data were correlated with those from bulk RNA-seq, indicating that the scRNA-seq as an omics dataset can genetically represent the individual cellular characteristic for GBC (Fig. S1).
+In these different cell types from 13 patients, we observed great differences in the cell fraction for each cell type (Fig. 1E). Of note, the populations of M2 macrophages, Tregs, and epithelial cells in all tumors were greater than those in benign controls, whereas CAF-MAPF5, endothelial-DCN, and monocyte-like cell populations were larger in controls than tumors (Fig. 1F, Fig. S2). These observations indicate that GBC cancers are of intra-tumoral and inter-tumoral cellular heterogeneity, representing a complex cellular ecosystem in patients with GBC.
+ Epithelial cell subtype analysis
+Most of the previous studies have demonstrated that malignant GBC cells were derived from epithelial cells.[4],[7] Given earlier cellular distribution data, we focused on the epithelial cells from GBC1-GBC9 with scRNA-seq, bulk RNA-seq and WES data. Interestingly, we found there were 4 distinct subtypes of epithelial cells with specific individual markers: the subtype 1, 2 and 3 epithelial cells were mainly distributed in 8 patients with AC (GBC1-GBC8), and subtype 4 in 1 patient with ASC (GBC9) (Fig. 2A, B, Fig. S3A). In addition, the epithelial cells from each patient formed their specific clusters based on the result of our analysis: the transcriptomics distance between any 2 epithelial cells with 2,000 highly variable genes within each tumor was significantly lower than that of epithelial cells between the tumor and any other 8 tumors (Table S5). Furthermore, we found that subtype 1 epithelial cells exhibited a variety of biological functions including responses to lipopolysaccharide and cell adhesion mediated by integrin; subtype 2 epithelial cells were closely related with cell division and regulation of the mitotic cell cycle; subtype 3 epithelial cells mediated immunity-related processes, such as interferon-gamma-mediated signaling pathways, antigen processing and presentation of peptide antigen via MHC class I; and subtype 4 participated in cell adhesion and cell development (Fig. 2C). To monitor if the different epithelial subtypes possess divergent genetic variations, we analyzed large-scale chromosomal copy number variations (CNVs) in 9 cases and found that epithelial cells from tumor tissues displayed higher CNV levels than those from adjacent normal tissues (Fig. S3B). In particular, subtype 2 and 3 epithelial cells exhibited remarkably higher CNV levels than subtype 1 epithelial cells (Fig. S3C).
+Figure thumbnail gr2
+Fig. 2Heterogeneity of epithelial cell subtypes.
+
+
+View Large ImageFigure ViewerDownload Hi-res imageDownload (PPT)
+Given that gallbladder ACs account for more than 85% of GBCs, we firstly analyzed these 3 AC epithelial subtypes. Subtype 2 and 3 epithelial cells were located in tumor tissues related to normal tissues, while subtype 1 cells were mainly enriched in adjacent normal tissues which were expected to represent normal epithelial cells (Fig. 2D). Because subtype 1 and 2 epithelial cells were both related to cell proliferation and constituted a larger proportion (93.4%) of epithelial cells in AC tumors, the cellular relationship and genetic specificity of both subtypes were subsequently studied. To investigate the possible transition of gallbladder cancer cells mainly from a single type of epithelial cell, we performed the trajectory analysis and revealed a transition model of cell distribution (Fig. 2E, Fig. S4A, B). The model showed that type 1 cells mainly accumulated in the adjacent normal tissue and gradually decreased in tumor tissue, while the subtype 2 epithelial cells increased in tumor tissue. To precisely determine if there are distinct subcellular populations distributed between subtype 1 and 2 cells, we employed our previous dynamic network biomarker (DNB) model based on 3 criteria (PCCi, PCCo and SDi) to identify the pre-malignant state (tipping point) by analyzing the 3 clusters (normal, middle, and cancer state) of epithelial cells inferred from pseudotime analysis.[33] We found a strong signal of the critical state at the middle state by critically index (CI) based on DNB model, and treated it as the tipping point which represented the mixed population with type 1 and type 2 and contained 50 cells in the transition zone between normal and cancer tissue (Fig. S4C, Table S6). Many tumor-promoting genes were upregulated in tipping point status cells compared with subtype 1 cells, such as MYC and CXCL5 (Fig. 2F, Table S7).[7],[34] Likewise, a large number of genes were upregulated in subtype 2 cells compared to tipping point cells, such as ENO1 and CDK1 (Fig. 2G, Table S8).[35],[36] The gene function enrichment analysis showed distinct profiling of differently functional genes in subtype 1 cells, tipping point cells and subtype 2 cells (Fig. S5). This unique genetic profiling demonstrates the functional signatures of different epithelial types that may mediate tumorigenesis and evolution.
+To further analyze the rare subtype 4 epithelial cells in patients with ASC, we were interested in altered genes specific for ASC and found that KRTDAP and FAT2 were significantly upregulated in ASC together with the classical squamous cell marker TP63 (Fig. 2H, Fig. S6A-C, 7A). These data were consistent with analysis for each patient by bulk RNA-seq (Fig. S7B). Immunohistochemical (IHC) staining of KRT19, TP63, KRTDAP, FAT2 and another reported squamous cell marker S100A7 in ASC showed that TP63-, KRTDAP- or FAT2-positive cells were mainly present in the squamous cell region, but absent in adenocytes, whereas an AC marker KRT19 was expressed in adenocytes (Fig. 2I, Fig. S7C). S100A7, the novel marker of squamous cell carcinoma of the lung, was not evident in gallbladder ASC (Fig. S7D).[37] To establish this specific expression pattern in ASC, we analyzed an additional 11 ASCs and found that TP63 was ubiquitously distributed in all ASCs (11/11), while FAT2 was present in 9 cases and KRTDAP in 7 cases (Fig. S7E). The subtype 4 epithelial markers specific for ASC were identical to the squamous cell carcinoma of other human cancers such as lung and cervical cancer from The Cancer Genome Atlas database (Fig. S7F, G). Taken together, these results demonstrate that KRTDAP and FAT2 serve as biomarkers for gallbladder ASC.
+ WES analysis of patients with GBC
+We performed WES analysis in 9 patients with GBC to uncover the genomic variations related to tumor malignancy (Fig. 1A). The number of somatic mutations, including single nucleotide variations and small insertions and deletions, varied greatly among these tumors (Fig. 3A). For single nucleotide variations, C>T/G>A mutations were dominant in all of the tumors (Fig. S8A), which was consistent with our previous findings.[2],[16] The 3 signatures A, B and C corresponding to COSMIC mutation signatures 5, 2 and 1 were predicted and the distribution of mutation signatures varied in each tumor (Fig. S8B, C). Signature 1 and 2 were reported in our previous study,[2] while signature 5 was identified in GBC for the first time in this study, though the etiology remains unknown. The high mutational frequency of SYNE1, TP53, POU5F1, HSP90AB1 and FGFR3 in GBC1, 2, 5, 7 and 8 was similar to that documented in our database of tumor driver genes (Fig. 3B). Additionally, there was a similar pattern in the numbers and chromosomal distributions of somatic CNVs in these 5 GBC samples compared with other cases (Fig. 3C, D and Fig. S9). This was consistent with the transcriptomic similarity, specifically, the distance between any 2 epithelial cells within these 5 patients was significantly lower than that between these patients and any other patients (fold change = 0.899, p = 0).
+Figure thumbnail gr3
+Fig. 3Genomic mutations of 9 GBC tissues.
+
+
+View Large ImageFigure ViewerDownload Hi-res imageDownload (PPT)
+Given the highly frequent mutations in the ErbB pathway identified previously in GBC,[16] we mainly focused on ErbB pathway mutations in the current samples. A total of 3 samples (3/9) were detected with somatic mutations in the ErbB pathway, including GBC1, 2 and 7 (Fig. 3E). ErbB3 mutation was found in GBC7, while other mutations of genes involved in the ErbB pathway were located in these 3 cases. GBC1, 2 and 7 had a relatively closer transcriptomics distance than others on the epithelial cells at uniform manifold approximation and projection space (Fig. S10), and the transcriptomics distance of 2,000 highly variable genes between any 2 epithelial cells within GBC1, 2 and 7 was significantly lower than that between these 3 patients and the other 5 patients with AC (fold change = 0.899, p <2.2e-16). Again, 2 of the 3 cases (GBC1, 7) harbored large subcellular populations of Tregs, epithelial cells, and M2 macrophages compared to adjacent normal control tissue (Fig. S2), strongly suggesting that ErbB pathway mutations may participate in the activation and proliferation of these cell subsets.
+ MDK expression is upregulated in the epithelial cancer cells of GBC patients with ErbB pathway mutations
+To explore the potential relationship between ErbB pathway mutation and immune escape of cancer cells, we classified 8 patients with AC, based on whether they had tumors with ErbB pathway mutations (Tm: GBC1, 2 and 7) or tumors without ErbB pathway mutations (Tn: GBC3, 4, 5, 6 and 8). We found that there was larger cell population difference in subtype 1 and 2 epithelial cells, Tregs and M2 macrophages in Tm than Tn (Fig. 4A). To quantitatively analyze these different cell populations, we analyzed 21 and 20 cases with/without ErbB pathway mutations, respectively, for IHC analysis. The data showed that the Treg cell marker FOXP3 and M2 macrophage marker CD163 were both elevated in Tm relative to Tn (Fig. 4B, C), highlighting considerable subcellular populations of Tregs and M2 macrophages in patients with ErbB pathway mutations. To explore the potential intercellular crosstalk between these cell types in the TME, we performed cell-cell communications using ligand-receptor pairing analysis, and found that the epithelial cells (containing subtype 1 and 2 epithelial cells) more actively communicated with other cell types including Tregs, monocyte-like cells and M1/M2 macrophages in Tm than Tn (Fig. S11A). This result suggests that epithelial cells in Tm have a strong ability to communicate with Tregs and macrophages.
+Figure thumbnail gr4
+Fig. 4Difference of epithelial cell subtypes and predicted cell-cell interaction between tumors with or without ErbB pathway mutations.
+
+
+View Large ImageFigure ViewerDownload Hi-res imageDownload (PPT)
+Because subtype 2 epithelial cells were mainly located in tumor tissue, we analyzed the genetic differences of subtype 2 epithelial cells between Tm and Tn (Fig. 4D, Table S9). The Gini index program was subsequently engaged to identify potential secreted protein candidates and we found that CD24, midkine (MDK) and SERPINA1 were elevated in epithelial cells with ErbB pathway mutations relative to cells without ErbB pathway mutations (Gini index >0.60, Fig. 4E). In line with this dataset, the 3 secreted proteins were also upregulated in the 3 patients with ErbB pathway mutations by bulk RNA-seq analysis (Fig. 4F). To further define which protein(s) play a key role in the communication of the epithelial cells with other cell types, we employed CellPhoneDB software and found that ligand-receptor pairings of MDK-LRP1 and MDK-SORL1 predominantly contributed to the different cellular interactions in mutated cancers. As shown in Fig. 4G, epithelial cells, monocyte-like cells, M1 and M2 macrophages demonstrated stronger MDK-LRP1/SORL1 interactions in cancers with ErbB mutations than in those without ErbB mutations. Indeed, a considerable number of the MDK-related receptor mutations were accumulated in GBC2 and GBC7 (Fig. S11B). In addition, NicheNet software was engaged to predict the mode of ligand/receptor interaction between subtype 2 epithelial cells and M2 macrophages, and gene expression of M2 macrophages induced by molecules derived from subtype 2 epithelial cells. As a result, we provide evidence of the interaction between MDK and LRP1 (Fig. S12A) and show that MDK upregulates NUPR1 and CXCL10 (Fig. S12B). Consistent with these data, immunofluorescence analysis also revealed that the expression level of MDK in epithelial cells was significantly higher in representative GBC1 tissue infiltrated with more CD68+ macrophages than the GBC8 sample (Fig. S13), suggesting that epithelial cells strongly communicate with macrophages via MDK in patients with GBC and ErbB pathway mutations.
+
+ ErbB mutations upregulate MDK via PI3K/AKT
+To further validate that ErbB pathway mutation contributes to the upregulation of MDK, we first co-transfected wild-type (WT) ERBB2 with WT or mutant ERBB3 vectors into a GBC-SD cell line, given the association of ERBB2/ERBB3 heterodimers essential for ErbB signaling activation and ERBB3 mutation identified in GBC7 patient. We found that secreted MDK in cell media was elevated when ERBB3 mutant and ERBB2 WT were co-transfected into the GBC-SD and SGC-996 cells, rather than ERBB2/3 WT (Fig. 4H). In addition, the expression levels of MDK mRNA and protein were higher in the ERBB3 mutant group than in the ERBB3 WT group (Fig. 4I, J). Since the PI3K/AKT pathway mediates intracellular signaling following ERBB2/ERBB3 activation,[2] we examined if PI3K/AKT regulates MDK expression. As shown in Fig. 4J and K, p-AKT was induced in the cells expressing ERBB2 WT/ERBB3 V104L and blockade of PI3K/AKT using the AKT inhibitor (MK-2206 2HCL) led to suppression of both p-AKT and MDK, supporting the notion that ErbB pathway mutations promote MDK expression in a manner dependent on PI3K/AKT.
+ MDK-LRP1 promotes immunosuppressive macrophage differentiation
+The early evidence suggested a possible model of subcellular interaction between epithelial tumor cells and adjacent immune cells mediated by MDK in the TME. We thus proposed the hypothesis that epithelial-derived tumor cells with ErbB pathway mutations induce expression of MDK which could inhibit anti-tumor immunity in subcellular populations. To test this hypothesis, we were particularly interested in macrophage subpopulations that constitute a primary population of infiltrating immune cells in tumors, given evidence that the immunosuppressive (M2) macrophages were increased in Tm compared to Tn (Fig. 4A). In GBC, 2,103 monocyte-like cells, 2,785 M1 macrophages and 5,948 M2 macrophages were identified (Fig. 5A, Fig. S14A-C). We found that STAT1 and its target genes (CXCL9 and CXCL10) were upregulated in immunosuppressive macrophages of Tm compared to Tn (Fig. 5B, Table S10). In addition, ligand-receptor pairing analysis exhibited stronger CXCL10-CXCR3 interactions in CD4+ T and Tregs in Tm than in Tn (Fig. 5C), indicating that M2 macrophages of GBC tumors with ErbB pathway mutations potentially commit epithelial cells to immune escape, likely by recruiting or activating CD4+T cells and Tregs.
+
+Fig. 5MDK promotes immunosuppressive (M2) macrophage differentiation by interaction with LRP1.
+
+View Large ImageFigure ViewerDownload Hi-res imageDownload (PPT)
+To further validate whether MDK plays an essential role in the immunosuppressive macrophage differentiation, we treated a human monocyte line (THP-1) with recombinant protein MDK and collected conditioned media from human GBC cells. Interestingly, addition of MDK or conditioned media from mutated-ERBB3 GBC cells to THP-1 showed significant effects on monocyte differentiation, and adherent cells were increased (Fig. 5D-F). Accordingly, the protein levels of M2 macrophage markers (CD163, CD206 and IL10) were induced after treatment with MDK or coculture with conditioned media from mutated-ERBB3 GBC cells (Fig. 5G). Consistent with this data, mRNA expression levels of M2 markers were increased, but M1 markers in macrophages were decreased after treatment with MDK or conditioned media from mutated-ERBB3 GBC cells (Fig. S14D, E). Flow cytometry analysis of CD11b (pan-macrophage) and CD206 expression also supported that treatment with conditional media from mutated-ERBB3 GBC cells induced immunosuppressive macrophages (Fig. 5H). In addition, we found that the MDK receptor LRP1 was simultaneously overexpressed in M1 and M2 macrophages of Tm (Fig. 5I, J). In contrast, exposure of peripheral blood mononuclear cells (PBMCs) to an LRP1 neutralizing antibody in the presence of MDK significantly decreased the M2 population that was notably upregulated by MDK only (Fig. 5K, Fig. S14F, G). In line with this observation, siRNA LRP1 fully blocked MDK-induced THP-1 cell adhesion and spreading, thus impairing cell differentiation (Fig. S15A, B). This evidence revealed that MDK-LRP1 is an essential factor for immunosuppressive macrophage differentiation.
+
+To subsequently interrogate if immunosuppressive macrophages induced by MDK have the ability to recruit Tregs, we treated THP-1 cells with MDK to allow them to differentiate into immunosuppressive macrophages. PBMCs were placed in the upper chamber of the transwell, and the lower chamber was then filled with the supernatant of MDK-induced M2 macrophages. After coculture, Tregs that migrated to the lower transwell chamber were analyzed by flow cytometry. As shown in Fig. S16, MDK-induced M2 macrophages enhanced the recruitment of CD4+CD25+CD127low Tregs.
+Finally, we sought to evaluate the relationship of MDK with patient clinical outcome. We additionally collected 41 samples (Tm = 21; Tn = 20) and performed IHC analysis to further evaluate the association between MDK expression and ErbB pathway mutations. The data showed that MDK expression was significantly higher in patients with ErbB pathway mutations (Fig. 6A, B). We further classified these patients with GBC into 2 groups based on MDK expression (low <3 and high >3 score) for comparison of survival. The Kaplan−Meier analysis revealed that higher MDK expression was significantly correlated with shorter overall survival (p = 0.0092; Fig. 6C). In addition, immunofluorescence staining showed that Tm expressed higher levels of MDK, CD163 and FOXP3, suggesting that tumor cell-derived MDK activates infiltration of immunosuppressive macrophages which in turn recruit Tregs to the TME in tissues with ErbB pathway mutations (Fig. 6D, Fig. S17). All the results suggest that MDK upregulated by ErbB pathway mutation acts as a key factor to promote immunosuppressive macrophage differentiation, which in turn activates Tregs and leads to tumor immune escape and tumor development.
+
+View Large ImageFigure ViewerDownload Hi-res imageDownload (PPT)"
+
+## Rank sentences
+results <- lexRankr::lexRank(text,
+                  docId = rep(1, length(text)),
+                  n = 5,
+                  continuous = TRUE) %>%
+  dplyr::mutate(sentenceId = as.numeric(stringr::str_remove_all(sentenceId, ".*_"))) %>%
+       mutate(value =  round(100 * value, digits = 4),
+              section = "results") %>% 
+       select(section, value, sentence) %>% 
+  dplyr::arrange(-value)
+
+head(results)
+```
+
+## Conclusion
+```{r}
+text <- "Conclusions
+This study has provided valuable insights into transcriptomic heterogeneity and the global cellular network in the TME, which coordinately functions to promote the progression of GBC with ErbB pathway mutations; thus, unveiling novel cellular and molecular targets for cancer therapy."
+
+## Rank sentences
+if(length(text) > 1) {
+  conclusion  <- lexRankr::lexRank(text,
+                  docId = 1,
+                  n = 2,
+                  continuous = TRUE) %>%
+  dplyr::mutate(sentenceId = as.numeric(stringr::str_remove_all(sentenceId, ".*_"))) %>%
+       mutate(value =  round(100 * value, digits = 4),
+              section = "conclusion") %>% 
+       select(section, value, sentence) %>% 
+  dplyr::arrange(-value)
+}else{
+  conclusion <- text %>% as.data.frame() %>% 
+    mutate(value =100, .before=1) 
+    colnames(conclusion)[2] <- "sentence"
+    
+    conclusion <- conclusion %>% 
+      mutate(section = "conclusion") %>% 
+       select(section, value, sentence)
+}
+  
+```
+
+## Reference
+```{r}
+
+```
+
+
+## Merge annotation
+```{r}
+annotation <- ""
+annotation <- rbind(annotation, abstract, intro, methods, results, conclusion)
+annotation %>% 
+  pander::pandoc.table()
+
+```
+
