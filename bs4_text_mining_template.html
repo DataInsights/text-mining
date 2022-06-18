@@ -146,25 +146,18 @@ $endfor$
       </div> -->
       
       <div class="col-12 col-md-6 mt-3">
-        <p>
-          <strong>Project Title: </strong>
-          $title$
-           
-          </p>
-          </div>
+        <p>$if(title)$$title$.$endif$</p>
+      </div>
         
       <div class="col-12 col-md-6 mt-3">
-        <p>
-          $if(subtitle)$<strong>Research Article: </strong>$subtitle$ $endif$
-        </p>
+        <p>$if(subtitle)$<strong>Primary Paper: </strong>$subtitle$.$endif$</p>
       </div>
     </div>
-    <p>
-      $if(date)$$date$.$endif$
-    </p>
+    
+    <p>$if(date)$This report was updated on $date$.$endif$</p>
+    
   </div>
 </footer>
-
 
 $if(math)$
 <!-- dynamically load mathjax for compatibility with self-contained -->

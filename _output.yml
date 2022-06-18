@@ -1,13 +1,3 @@
-# flexdashboard::flex_dashboard:
-#   orientation: columns
-#   vertical_layout: fill
-  
-# html_document:
-
-# pdf_document:
-# 
-# word_document:
-
 bookdown::gitbook:
   css: style.css
   toc_depth: 3

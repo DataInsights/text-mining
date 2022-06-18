@@ -1,23 +1,4 @@
----
-title: "NGS Article Summarization"
-subtitle: "One pager flyer and review summary"
-author: "<br>Client: Charles Thomson via Kolabtree"
-description: 
-output: 
-  flexdashboard::flex_dashboard:
-    orientation: columns
-css:
-- ngs-flyer/style.css
-- ngs-flyer/css/style.css
-bibliography:
-- ngs-flyer/library.bib
-- ngs-flyer/packages.bib
-- skeleton.bib
-citation_package:
-- natbib
-- biblatex
-- amsplain
----
+
 
 Row {data-height=350}
 -------------------------------------
@@ -27,14 +8,24 @@ Row {data-height=350}
 
     
 ### Strategy 
-
-<a href=""><img src="ngs-flyer/img/strategy.png" alt="Book cover" width="100%" style="padding: 10px 30px 10px 0px; float: left;"/></a>
-Article referenced: [@Zhang2021]
-Model used: [@Liu2019]
-
-(A–B) Workflow of experimental strategy. The discovery cohort was shown in (A), where collecting and processing fresh biopsy samples from 13 primary GBC tumors and adjacent normal tissues for scRNA-seq, bulk RNA-seq and WES analysis were briefly illustrated. The validation cohort was shown in (B). (C) The UMAP plot showing 16 cell types, patient origin, and tumor or adjacent normal tissue origin. (D) Dot plot showing the expression levels of marker genes in each cell type. (E) The bar chart showed the proportion of 13 GBCs in each cell type. 
-
-<!-- (F) Heatmap displaying the relative enrichment of each cell type in cancer and adjacent normal tissues of 13 GBCs. AC, adenocarcinoma; ASC, adenosquamous carcinoma; CAF, cancer-associated fibroblast; DC, dendritic cell; GBC, gallbladder cancer; IF, immunofluorescence; IHC, immunohistochemistry; scRNA-seq, single-cell RNA sequencing; Treg, regulatory T cell; UMAP, uniform manifold approximation and projection; WES, whole-exome sequencing. (This figure appears in color on the web.) -->
+- Discovery cohort: 13 human GBCs and adjacent normal tissues
+  - with or without ErbB pathway mutations
+  - fresh biopsy samples from 13 primary GBC tumors and adjacent normal tissues
+- Single-cell RNA-sequencing
+- Bulk RNA-sequencing
+ - immunohistochemical staining
+ - immunofluorescence staining 
+ - functional experiments
+- WES analysis
+  - reveal the genomic variations
+- Clustering 
+  - UMAP plot
+- Expression analysis
+  - Dot plot
+Distribution/Proportion
+  - Bar chart 
+- Enrichment
+  - Heatmap for relative enrichment
 
 ```{r}
 library(DiagrammeR)
@@ -111,31 +102,33 @@ Row {data-height=350}
 - Crosstalk between macrophage-secreted CXCL10 and its receptor CXCR3 on Tregs was induced in GBC with ErbB pathway mutations.
 <!-- - Growing evidence suggests that genomic alterations acquired during oncogenesis help tumor cells to escape immune surveillance.[2] In our previous studies, we performed whole-exome sequencing (WES) in a larger number of patients with GBC and identified that ErbB signaling is the most extensively mutated pathway that mediates anti-tumor immunity, and elevated ErbB-mutation levels are correlated with a worse outcome in patients with GBC.[2],[16] - However, these studies generally relied on data from bulk tumor profiling, limiting their ability to accurately decipher tumor heterogeneity and genomic variations between individual cells, which are expected to contribute to tumor transformation and poor prognosis. -->
 
-<a href=""><img src="images/mdk.gif" alt="Book cover" width="100%" style="padding: 10px 0px 10px 0px; float: right;"/></a>
 
-```{r}
+```{r magick_magrittr_gif, fig.height=6, fig.width=8}
 library(magick)
 library(magrittr)
-list.files(path="images", pattern = '*.png', full.names = TRUE) %>% 
+list.files(path="ngs-flyer/images/", pattern = 'Screen.*.png', full.names = TRUE) %>% 
         image_read() %>% 
         image_join() %>%
-        image_animate(fps=4) %>% 
-        image_write("images/mdk.gif") 
+        image_animate(fps=0.5) %>% 
+        image_write("./ngs-flyer/images/mdk_gbc1.gif") 
 ```
 
-
-```{r}
+```{r gifski_gif, eval=FALSE, fig.height=6, fig.width=8, include=FALSE}
 library(gifski)
-png_files <- list.files("images", pattern = ".*png$", full.names = TRUE)
-gifski(png_files, gif_file = "flyer.gif", width = 800, height = 600, delay = 1)
+png_files <- list.files("ngs-flyer/images", pattern = "Screen.*.png", full.names = TRUE)
+gifski(png_files, gif_file = "./ngs-flyer/images/mdk_gbc2.gif", width = 800, height = 600, delay = 2)
 ```
+
 
 Row {data-height=350}
 -------------------------------------
 
 ### Results cont...
  
-<a href=""><img src="ngs-flyer/img/strategy.jpeg" alt="Book cover" width="80%" style="padding: 10px 0px 10px 0px; float: right;"/></a>
+<a href=""><img src="ngs-flyer/images/mdk_gbc1.gif" alt="mdk_gbc_gif" width="100%" style="padding: 20px 20px 20px 20px; float: right;"/></a>
+<!-- <a href=""><img src="ngs-flyer/images/mdk_gbc2.gif" alt="mdk_gbc_gif" width="100%" style="padding: 20px 20px 20px 20px; float: right;"/></a> -->
+
+<!-- ![](ngs-flyer/images/mdk_gbc1.gif){width=100%} -->
 
 ### Conclusion
 
