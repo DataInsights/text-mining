@@ -1,8 +1,8 @@
 <!-- # <strong>Article to review</strong>: Single-Cell RNA-Sequencing Atlas Reveals an MDK-Dependent Immunosuppressive Environment in ErbB Pathway-Mutated Gallbladder Cancer  -->
 
-<br>
+<!-- <br> -->
 
-Column {data-width=350}
+Section 1 {data-width=350}
 -----------------------------------------------------------------------
 
 ### Introduction
@@ -12,11 +12,12 @@ readRDS("RDataRDS/annotation.rds") %>%
   filter(section == "intro")
 ```
 
-- Growing evidence suggests that genomic alterations acquired during oncogenesis help tumor cells to escape immune surveillance.
-- ErbB signaling is the most extensively mutated pathway that mediates anti-tumor immunity, and elevated ErbB-mutation levels are correlated with a worse outcome in patients with GBC.
+- ErbB signaling is the most extensively mutated pathway that mediates anti-tumor immunity
+- Elevated ErbB-mutation levels are correlated with a worse outcome in patients with GBC.
 - However, these studies generally relied on data from bulk tumor profiling, limiting their ability to accurately decipher tumor heterogeneity and genomic variations between individual cells, which are expected to contribute to tumor transformation and poor prognosis.
-- The median survival of patients with GBC in general is less than 1 year, highlighting the extremely poor prognosis associated with this condition.
 - Therefore, it is worthwhile to globally understand cellular heterogeneity and the intimate interactions underpinning tumor malignancy in order to develop new therapeutic approaches to improve treatment.
+
+[Primary reference ](https://doi.org/10.1016/J.JHEP.2021.06.023), [@Zhang2021]
 
 
 ### Strategy
@@ -26,27 +27,8 @@ readRDS("RDataRDS/annotation.rds") %>%
 ```
 
 
-- Discovery cohort: 13 human GBCs and adjacent normal tissues
-  - with or without ErbB pathway mutations
-  - fresh biopsy samples from 13 primary GBC tumors and adjacent normal tissues
-- Single-cell RNA-sequencing
-- Bulk RNA-sequencing
- - immunohistochemical staining
- - immunofluorescence staining 
- - functional experiments
-- WES analysis
-  - reveal the genomic variations
-- Clustering 
-  - UMAP plot
-- Expression analysis
-  - Dot plot
-Distribution/Proportion
-  - Bar chart 
-- Enrichment
-  - Heatmap for relative enrichment
 
-
-Column {data-width=350}
+Section 2 {data-width=400}
 -----------------------------------------------------------------------
 ### Strategy cont...
 
@@ -56,7 +38,7 @@ library(DiagrammeRsvg)
 
 graph <- DiagrammeR::grViz("
 digraph {
-graph [layout = dot, rankdir = TD]
+graph [layout = circo, rankdir = TD]
 
 node [
 shape = box, 
@@ -67,41 +49,42 @@ penwidth = 2.0]
 
 edge [arrowhead = diamond]
 
-A [label = 'TAXONOMIC \nPROFILING FROM \nMICROBIOME DATA', fillcolor = white, penwidth = 5.0]
-B [label = 'Complex Data from \nSequencing Platforms\n(*.fastq.gz)', shape = folder]
-C [label = '16S rRNA Gene Amplicon\nSequencing Data']
-D [label = 'Metagenomics Shotgun\nSequencing Data']
-E [label = 'Mothur\nPipeline', shape = oval]
-F [label = 'QIIME2\nPipeline', shape = oval]
-G [label = 'MetaPhlAn\nPipeline', shape = oval]
-H [label = 'HUMAnN\nPipeline', shape = oval]
-I [label = 'ASV/OTU &\nTaxonomy Tables']
-J [label = 'Feature & Taxonomy\nTables']
-K [label = 'Microbial\nProfiles']
-L [label = 'MetaPhlAn\nBugs List']
-M [label = 'Processing Mothur, QIIME2,\nMetaPhlAn & HUMAnN Output', shape = oval, penwidth = 2.0]
-N [label = 'TIDY OTU & \nTAXONOMY\nTABLES',fillcolor = yellow, penwidth = 5.0]
+A [label = 'Discovery cohort\nGBCPatients']
+B [label = 'Ball Bladder\nFresh Biopsy Samples']
+C [label = 'Cell Suspension']
+D [label = 'Single-Cell \nRNA-sequencing']
+E [label = 'Transcriptomic \nHeterogeneity Analysis']
+F [label = 'Tissue Fragments']
+G [label = 'Bulk \nRNA-Sequencing']
+H [label = 'RNA-Sequencing\nRelation Analysis']
+I [label = 'Whole Exome \nSequencing']
+J [label = 'Mutation Analysis']
+K [label = 'ErbB Pathway\nMutation']
+L [label = 'Fibroblast']
+M [label = 'Macrophage']
+N [label = 'CD8+ T']
+O [label = 'CD4+ T']
+P [label = 'Treg']
+Q [label = 'Others']
 
-# A [color = black]
-# C,E,F,I,J [color = limegreen]
-# D,G,H,K,L [color = dodgerblue]
-
-{A}  -> B
-{B}  -> C
-{B}  -> D
-{C}  -> E
-{C}  -> F
-{D}  -> G
-{D}  -> H
-{E}  -> I
-{F}  -> J
-{G}  -> K
-{H}  -> L
-{I}  -> M [arrowhead = vee]
-{J}  -> M [arrowhead = vee]
-{K}  -> M [arrowhead = vee]
-{L}  -> M [arrowhead = vee]
-{M}  -> N 
+{A} -> B
+{B} -> C
+{B} -> D
+{C} -> E
+{D} -> F
+{F} -> G
+{G} -> H
+{F} -> I
+{I} -> J
+{E} -> K
+{H} -> K
+{J} -> K
+{K} -> L
+{K} -> M
+{K} -> N
+{K} -> O
+{K} -> P
+{K} -> Q
 
 
 }", height = 500, width = 500)
@@ -115,10 +98,43 @@ rsvg::rsvg_png(strategy, "img/strategy.png")
 ```
 
 
-![](img/strategy.png)
+```{r mermaid, include=FALSE}
+library(DiagrammeR)
+library(DiagrammeRsvg)
+
+graph <- mermaid("graph TB
+A[Discovery cohort GBCPatients] --> B[Ball Bladder<br>Fresh Biopsy Samples]
+B[Ball Bladder<br>Fresh Biopsy Samples] --> C[Cell Suspension]
+B[Ball Bladder<br>Fresh Biopsy Samples] --> D[Single-Cell <br>RNA-sequencing]
+C[Cell Suspension] --> E[Transcriptomic <br>Heterogeneity Analysis]
+D --> F[Tissue Fragments]
+F --> G[Bulk <br>RNA-Sequencing]
+G --> H[RNA-Sequencing<br>Relation Analysis]
+F --> I[hole Exome <br>Sequencing]
+I --> J[Mutation Analysis]
+E --> K[ErbB Pathway<br>Mutation]
+H --> K
+J --> K
+K --> L[Fibroblast]
+K --> M[Macrophage]
+K --> N[CD8+ T]
+K --> O[CD4+ T]
+K --> P[Treg]
+K --> Q[Others]
+
+", height = 500, width = 1200)
+
+```
+```{r echo=FALSE}
+graph
+```
 
 
-Column {data-width=450}
+
+<!-- ![](img/strategy.png) -->
+
+
+Section 3 {data-width=450}
 -----------------------------------------------------------------------
 
 ### Results
@@ -161,11 +177,7 @@ gifski(png_files, gif_file = "./images/mdk_gbc2.gif", width = 800, height = 600,
  
 <a href=""><img src="images/mdk_gbc1.gif" alt="mdk_gbc_gif" width="100%" style="padding: 20px 10px 0px 10px; float: right;"/></a>
 
-Primary reference [@Zhang2021]
-
-
-
-Column {data-width=250}
+Section 4 {data-width=250}
 -----------------------------------------------------------------------
 
 ### Conclusion
@@ -177,11 +189,7 @@ readRDS("RDataRDS/annotation.rds") %>%
 
 This study has provided valuable insights into transcriptomic heterogeneity and the global cellular network in the TME, which coordinately functions to promote the progression of GBC with ErbB pathway mutations; thus, unveiling novel cellular and molecular targets for cancer therapy.
 
-
-
 ### References
-
-
 
 ```{r include=FALSE}
 ## Word count

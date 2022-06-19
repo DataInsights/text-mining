@@ -1,8 +1,8 @@
-delete_merged_file: true
+delete_merged_file: false
 language:
   ui:
     chapter_name: ""
-book_filename: "flyer_template"
+book_filename: "flyer-template"
 output_dir:
 
 rmd_files: [

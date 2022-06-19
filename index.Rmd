@@ -1,7 +1,8 @@
 ---
-title: "<strong>Project Title</strong>: NGS writers to review primary papers and provide a 1 pager flyer / review of the paper."
-subtitle: "Single-Cell RNA-Sequencing Atlas Reveals an MDK-Dependent Immunosuppressive Environment in ErbB Pathway-Mutated Gallbladder Cancer."
-date: "This report was updated on `r Sys.Date()`"
+title: "<strong>Project Title</strong>: NGS writers to review primary papers and provide a 1 pager flyer / review of the paper:"
+# subtitle: "Single-Cell RNA-Sequencing Atlas Reveals an MDK-Dependent Immunosuppressive Environment in ErbB Pathway-Mutated Gallbladder Cancer"
+author: "<strong>Client:</strong> Charles Thompson via Kolabtree"
+date: "<strong>Last Updated</strong>: `r Sys.Date()`"
 site: bookdown::bookdown_site
 knit: bookdown::render_book
 output: 
@@ -60,4 +61,6 @@ library(tidyverse, suppressPackageStartupMessages())
 ```
 
 
-# <strong>Reviewed Article</strong>: Single-Cell RNA-Sequencing Atlas Reveals an MDK-Dependent Immunosuppressive Environment in ErbB Pathway-Mutated Gallbladder Cancer
+# Article 1
+**Title: Single-Cell RNA-Sequencing Atlas Reveals an MDK-Dependent Immunosuppressive Environment in ErbB Pathway-Mutated Gallbladder Cancer**
+

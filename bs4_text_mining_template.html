@@ -146,16 +146,16 @@ $endfor$
       </div> -->
       
       <div class="col-12 col-md-6 mt-3">
-        <p>$if(title)$$title$.$endif$</p>
+        <p>$if(title)$<strong>Project Title: </strong>$title$$endif$. </p>
+    <!--  <p>$if(subtitle)$$subtitle$.$endif$</p> -->
       </div>
         
       <div class="col-12 col-md-6 mt-3">
-        <p>$if(subtitle)$<strong>Primary Paper: </strong>$subtitle$.$endif$</p>
+        <p><strong>Client: </strong>$for(author)$$author$$sep$, $endfor$
+        <br>$if(date)$$date$.$endif$</p>
       </div>
+      
     </div>
-    
-    <p>$if(date)$This report was updated on $date$.$endif$</p>
-    
   </div>
 </footer>
 
