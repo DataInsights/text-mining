@@ -2,7 +2,7 @@
 
 <!-- <br> -->
 
-Section 1 {data-width=350}
+{data-width=400}
 -----------------------------------------------------------------------
 
 ### Introduction
@@ -26,11 +26,6 @@ readRDS("RDataRDS/annotation.rds") %>%
   filter(section == "methods")
 ```
 
-
-
-Section 2 {data-width=400}
------------------------------------------------------------------------
-### Strategy cont...
 
 ```{r include=FALSE}
 library(DiagrammeR)
@@ -102,39 +97,67 @@ rsvg::rsvg_png(strategy, "img/strategy.png")
 library(DiagrammeR)
 library(DiagrammeRsvg)
 
-graph <- mermaid("graph TB
-A[Discovery cohort GBCPatients] --> B[Ball Bladder<br>Fresh Biopsy Samples]
-B[Ball Bladder<br>Fresh Biopsy Samples] --> C[Cell Suspension]
-B[Ball Bladder<br>Fresh Biopsy Samples] --> D[Single-Cell <br>RNA-sequencing]
+graph <- mermaid("graph TD
+A[DISCOVERY COHORT] --> |GBC Patients| B[Ball Bladder<br>Fresh Biopsy Samples]
+subgraph SEQUENCING & PRELIMINARY ANALYSIS</strong>
+B[Ball Bladder Fresh Biopsy Samples] --> C[Cell Suspension]
+B --> D[Single-Cell <br>RNA-sequencing]
 C[Cell Suspension] --> E[Transcriptomic <br>Heterogeneity Analysis]
 D --> F[Tissue Fragments]
 F --> G[Bulk <br>RNA-Sequencing]
 G --> H[RNA-Sequencing<br>Relation Analysis]
-F --> I[hole Exome <br>Sequencing]
+F --> I[Whole Exome <br>Sequencing]
 I --> J[Mutation Analysis]
-E --> K[ErbB Pathway<br>Mutation]
+end
+E --> K{ErbB Pathway Mutation}
 H --> K
 J --> K
+subgraph INTERCELLULAR CROSSTALK ANALYSIS
 K --> L[Fibroblast]
 K --> M[Macrophage]
 K --> N[CD8+ T]
 K --> O[CD4+ T]
 K --> P[Treg]
-K --> Q[Others]
+K -.-> Q[Others]
+end
 
-", height = 500, width = 1200)
+", height = 800, width = 1000)
 
 ```
+
+
 ```{r echo=FALSE}
 graph
 ```
 
 
+```{r eval=FALSE, include=FALSE}
+DiagrammeR::mermaid("
+graph TD
+A[Christmas] -->|Get money| B(Go shopping)
+subgraph Nerve wracking
+B --> C{Roll a dice}
+end
+subgraph Don't look
+  C -->|One| D[Laptop]
+  C -->|Two| E[iPhone]
+  subgraph High Probability
+    C-->|Three| G
+    C-->|Four| G
+    C-->|Five| G[A gift card]
+  end
+  subgraph Low Probability
+    C -->|Six| F[fa:fa-car Car]
+  end
+end
+")
+```
+
 
 <!-- ![](img/strategy.png) -->
 
 
-Section 3 {data-width=450}
+{data-width=350}
 -----------------------------------------------------------------------
 
 ### Results
@@ -177,7 +200,7 @@ gifski(png_files, gif_file = "./images/mdk_gbc2.gif", width = 800, height = 600,
  
 <a href=""><img src="images/mdk_gbc1.gif" alt="mdk_gbc_gif" width="100%" style="padding: 20px 10px 0px 10px; float: right;"/></a>
 
-Section 4 {data-width=250}
+{data-width=250}
 -----------------------------------------------------------------------
 
 ### Conclusion

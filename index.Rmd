@@ -8,7 +8,9 @@ knit: bookdown::render_book
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
-    vertical_layout: fill
+    # vertical_layout: fill
+    # vertical_layout: fill
+    vertical_layout: scrol
   # html_document:
   # pdf_document:
   # word_document:
