@@ -1,0 +1,131 @@
+## Publications by year
+```{r}
+library(tidyverse)
+library(rentrez)
+library(glue)
+
+read_csv("data/PubMed_Timeline_Results_by_Year.csv",
+         skip=1) %>%
+  ggplot(aes(x=Year, y=Count)) +
+  geom_line() +
+  theme_classic()
+```
+
+## Databases available in Entrez
+```{r}
+entrez_dbs()
+```
+
+
+## PubMed summary
+```{r}
+entrez_db_summary(db = "pubmed")
+```
+
+
+## PubMed search fields
+```{r}
+entrez_db_searchable(db = "pubmed")
+```
+
+
+## Hits on search term
+```{r}
+s <- entrez_search(db = "pubmed", term = "microbiome")
+glimpse(s)
+s$count
+```
+
+## Count by serach term(s)
+```{r}
+entrez_search(db = "pubmed", term = "Buza T [AUTH]")
+entrez_search(db = "pubmed", term = "mothur [ALL] AND microbiome")
+entrez_search(db = "pubmed", term = "qiime [ALL] AND microbiome")
+entrez_search(db = "pubmed", term = "dada2 [ALL] AND microbiome")
+```
+
+## Getting PMIDs
+```{r}
+microbiome <- entrez_search(db = "pubmed", term = "microbiome")$ids
+head(microbiome)
+```
+
+## Pull out abstracts
+```{r}
+entrez_fetch(db="pubmed", id=head(microbiome, 1), rettype="abstract")
+```
+
+## Searching within a year
+```{r}
+entrez_search(db = "pubmed", term = "microbiome AND 2021[PDAT]")$count
+```
+
+## Searching within a range of years
+```{r}
+year <- 2015:2022
+ubiome_search <- glue("microbiome AND {year}[PDAT]")
+cancer_search <- glue("cancer AND {year}[PDAT]")
+all_search <- glue("{year}[PDAT]")
+
+search_counts <- tibble(year = year,
+       ubiome_search = ubiome_search,
+       cancer_search = cancer_search,
+       all_search = all_search) %>%
+  mutate(ubiome = map_dbl(ubiome_search, ~entrez_search(db="pubmed", term=.x)$count),
+         cancer = map_dbl(cancer_search, ~entrez_search(db="pubmed", term=.x)$count),
+         all = map_dbl(all_search, ~entrez_search(db="pubmed", term=.x)$count)
+         )
+```
+
+## Compare publications
+```{r}
+search_counts %>%
+  select(year, ubiome, cancer, all) %>%
+  filter(year != 2022) %>%
+  pivot_longer(-year) %>%
+  ggplot(aes(x=year, y= value, group=name, color=name)) +
+  geom_line() + 
+  theme_classic() + 
+  scale_y_log10()
+  
+
+```
+
+## Compare publications
+```{r}
+search_counts %>%
+  select(year, ubiome, cancer, all) %>%
+  filter(year != 2022) %>%
+  mutate(rel_ubiome = 100 * ubiome / all) %>%
+  ggplot(aes(x=year,  y=rel_ubiome)) +
+  geom_line() +
+  theme_classic() + 
+  scale_y_log10()
+  
+```
+
+## Compare relative publications byfields {#relpubs-by-field}
+```{r}
+# thumbnail
+search_counts %>%
+  select(year, ubiome, cancer, all) %>%
+  filter(year != 2022) %>%
+  mutate(rel_ubiome = 100 * ubiome / all,
+         rel_cancer = 100 * cancer / all) %>%
+  select(year, starts_with("rel")) %>%
+  pivot_longer(-year) %>%
+  ggplot(aes(x=year, y=value, group=name, color=name)) +
+  geom_line(size=1) +
+  scale_y_log10(limits=c(NA, 100),
+                breaks=c(0.01, 0.1, 1, 10, 100),
+                labels=c("0.01", "0.1", "1", "10", "100")) +
+  labs(x="Year", y="Percentage of all papers in PubMed") +
+  scale_color_manual(name=NULL,
+                     label=c("Cancer", "Microbiome"),
+                     values=c("gray", "red"),
+                     breaks=c("rel_cancer", "rel_ubiome")) +
+  theme_classic() 
+
+ggsave("figures/microbiome_vs_cancer.png", width=6, height=4)
+```
+

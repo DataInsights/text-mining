@@ -1,7 +1,7 @@
 ---
-title: "<strong>Project Title</strong>: NGS writers to review primary papers and provide a 1 pager flyer / review of the paper:"
-# subtitle: "Single-Cell RNA-Sequencing Atlas Reveals an MDK-Dependent Immunosuppressive Environment in ErbB Pathway-Mutated Gallbladder Cancer"
-author: "<strong>Client:</strong> Charles Thompson via Kolabtree"
+title: "Pubmed Literature Tracking in R"
+subtitle: "Searching and visually comparing different fields"
+author: "Teresia Mrema-Buza"
 date: "<strong>Last Updated</strong>: `r Sys.Date()`"
 site: bookdown::bookdown_site
 knit: bookdown::render_book
@@ -10,7 +10,7 @@ output:
     orientation: columns
     # vertical_layout: fill
     # vertical_layout: fill
-    vertical_layout: scrol
+    vertical_layout: scroll
   # html_document:
   # pdf_document:
   # word_document:
@@ -63,6 +63,35 @@ library(tidyverse, suppressPackageStartupMessages())
 ```
 
 
-# Article 1
-**Title: Single-Cell RNA-Sequencing Atlas Reveals an MDK-Dependent Immunosuppressive Environment in ErbB Pathway-Mutated Gallbladder Cancer**
+# Getting PubMed Entrez Data
+```{r fig.cap="Microbiome Workflow", include=FALSE}
+library(DiagrammeR)
+library(DiagrammeRsvg)
+
+mermaidgraph <- mermaid("graph TD
+A[NCBI PubMed Database] --> |Search Term| B[Microbiome]
+B --> |Search Results| C[Indexed Papers in PubMed]
+C --> |Download results| D[Results by Year in CSV format]
+D --> |Filename| E[PubMed_Timeline_Results_by_Year.csv]
+E --> F[Save file in data directory]
+F -.-> G[Further Analysis in R]
+
+", height = 800, width = 1000)
+
+mermaidgraph
+
+```
+
+
+<a href=""><img src="img/pubmed_lit_search.png" alt="Book cover" width="40%" style="padding: 0px 0px 50px 0px; float: right;"/></a>
+
+## Quick Glimpse {-}
+Investigating the role of microbial communities in health and disease requires a thorough knowledge of the entire analytical process. Using wrong approaches can cost a significant amount of dollars and lengthy process to achieve the desired results. This is <b>PART 4</b> of the practical user guides intended to provide analytical support to the microbiome research community. The entire guide is reproducible, allowing users to easily follow along. If interested, user may use this model to publish their findings in a book format.
+
+## Structure of this guide {-}
+This guide is divided into chapters to facilitate easy navigation. Each chapter contains several sections as displayed in the navigation bars on the left and right. Click the hyper-linked text if you want to jump into a specific chapter or section.
+
+## Code availability {-}
+The code that generated this guide is available at a public [GitHub repository](https://github.com/DataInsights/pubmed-tracking/) or via a [GH-Page](https://tmbuza.github.io/pubmed-tracking/). If interested you can request a consulting service by contacting the developer of this repo using <a href="https://complexdatainsights.com/contact-us">this contact form</a>. 
+
 

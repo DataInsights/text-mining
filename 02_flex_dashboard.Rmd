@@ -1,8 +1,12 @@
 <!-- # <strong>Article to review</strong>: Single-Cell RNA-Sequencing Atlas Reveals an MDK-Dependent Immunosuppressive Environment in ErbB Pathway-Mutated Gallbladder Cancer  -->
 
-<!-- <br> -->
+```{r include=FALSE}
+source("R/common.R")
+library(flexdashboard)
+library(tidyverse, suppressPackageStartupMessages())
+```
 
-{data-width=400}
+PART 1 {data-width=350}
 -----------------------------------------------------------------------
 
 ### Introduction
@@ -11,21 +15,23 @@
 readRDS("RDataRDS/annotation.rds") %>% 
   filter(section == "intro")
 ```
-
+- Gallbladder carcinoma (GBC) is the most common cancer of the biliary tract and the sixth most common type of gastrointestinal cancer worldwide.
+- Growing evidence suggests that genomic alterations acquired during oncogenesis help tumor cells to escape immune surveillance.
 - ErbB signaling is the most extensively mutated pathway that mediates anti-tumor immunity
-- Elevated ErbB-mutation levels are correlated with a worse outcome in patients with GBC.
-- However, these studies generally relied on data from bulk tumor profiling, limiting their ability to accurately decipher tumor heterogeneity and genomic variations between individual cells, which are expected to contribute to tumor transformation and poor prognosis.
-- Therefore, it is worthwhile to globally understand cellular heterogeneity and the intimate interactions underpinning tumor malignancy in order to develop new therapeutic approaches to improve treatment.
+- This study tested the hypothesis that individual cellular components of the tumor microenvironment (TME) in GBC function differentially to participate in ErbB pathway mutation-dependent tumor progression.
 
 [Primary reference ](https://doi.org/10.1016/J.JHEP.2021.06.023), [@Zhang2021]
 
 
-### Strategy
+### Research Strategy
 ```{r include=FALSE}
 readRDS("RDataRDS/annotation.rds") %>% 
   filter(section == "methods")
 ```
 
+- This study engaged single-cell RNA-sequencing to reveal transcriptomic heterogeneity and intercellular crosstalk from 13 human GBCs and adjacent normal tissues. 
+- WES analysis was performed to reveal the genomic variations related to tumor malignancy. 
+- A variety of bulk RNA-sequencing, immunohistochemical staining, immunofluorescence staining and functional experiments were employed to study the difference between tissues with or without ErbB pathway mutations.
 
 ```{r include=FALSE}
 library(DiagrammeR)
@@ -33,7 +39,8 @@ library(DiagrammeRsvg)
 
 graph <- DiagrammeR::grViz("
 digraph {
-graph [layout = circo, rankdir = TD]
+# graph [layout = circo, rankdir = TD]
+graph [rankdir = TD]
 
 node [
 shape = box, 
@@ -45,7 +52,7 @@ penwidth = 2.0]
 edge [arrowhead = diamond]
 
 A [label = 'Discovery cohort\nGBCPatients']
-B [label = 'Ball Bladder\nFresh Biopsy Samples']
+B [label = 'Gallbladder\nFresh Biopsy Samples']
 C [label = 'Cell Suspension']
 D [label = 'Single-Cell \nRNA-sequencing']
 E [label = 'Transcriptomic \nHeterogeneity Analysis']
@@ -64,9 +71,9 @@ Q [label = 'Others']
 
 {A} -> B
 {B} -> C
-{B} -> D
-{C} -> E
-{D} -> F
+{C} -> D
+{D} -> E
+{B} -> F
 {F} -> G
 {G} -> H
 {F} -> I
@@ -101,9 +108,9 @@ graph <- mermaid("graph TD
 A[DISCOVERY COHORT] --> |GBC Patients| B[Ball Bladder<br>Fresh Biopsy Samples]
 subgraph SEQUENCING & PRELIMINARY ANALYSIS</strong>
 B[Ball Bladder Fresh Biopsy Samples] --> C[Cell Suspension]
-B --> D[Single-Cell <br>RNA-sequencing]
-C[Cell Suspension] --> E[Transcriptomic <br>Heterogeneity Analysis]
-D --> F[Tissue Fragments]
+C --> D[Single-Cell <br>RNA-sequencing]
+D --> E[Transcriptomic <br>Heterogeneity Analysis]
+B --> F[Tissue Fragments]
 F --> G[Bulk <br>RNA-Sequencing]
 G --> H[RNA-Sequencing<br>Relation Analysis]
 F --> I[Whole Exome <br>Sequencing]
@@ -122,13 +129,22 @@ K -.-> Q[Others]
 end
 
 ", height = 800, width = 1000)
-
+  # export_graph(graph,
+  #   file_name = "img/mermaidgraph",
+  #   file_type = "PNG")
 ```
 
 
-```{r echo=FALSE}
+
+PART 2 {data-width=450}
+-----------------------------------------------------------------------
+```{r include=FALSE}
 graph
 ```
+
+
+<!-- ![Workflow of experimental strategy](img/workflow.png){width=70%} -->
+<a href=""><img src="img/workflow.png" alt="flowchart" width=80%" style="margin: 0px 10% 0px 10%; float: middle;"/>Workflow of experimental strategy</a>
 
 
 ```{r eval=FALSE, include=FALSE}
@@ -156,9 +172,9 @@ end
 
 <!-- ![](img/strategy.png) -->
 
-
-{data-width=350}
+PART 3 {data-width=350}
 -----------------------------------------------------------------------
+
 
 ### Results
 
@@ -166,42 +182,33 @@ end
 readRDS("RDataRDS/annotation.rds") %>% 
   filter(section == "results")
 ```
-
-- Consistent with these data, immunofluorescence analysis also revealed that the expression level of MDK in epithelial cells was significantly higher in representative GBC1 tissue infiltrated with more CD68+ macrophages than the GBC8 sample (Fig.
-Again, 2 of the 3 cases (GBC1, 7) harbored large subcellular populations of Tregs, epithelial cells, and M2 macrophages compared to adjacent normal control tissue (Fig.
-- Consistent with this data, mRNA expression levels of M2 markers were increased, but M1 markers in macrophages were decreased after treatment with MDK or conditioned media from mutated-ERBB3 GBC cells (Fig.
-- Accordingly, the protein levels of M2 macrophage markers (CD163, CD206 and IL10) were induced after treatment with MDK or coculture with conditioned media from mutated-ERBB3 GBC cells (Fig.
-- To define the cellular composition in the TME and subpopulation structure of GBC, we performed graph-based clustering analysis on these cells and identified 16 distinct cell types based on known marker genes or specific genes expressed by each cell type, including epithelial cell, endothelial cell_VWF, endothelial cell_DCN, myofibroblast, cancer-associated fibroblast (CAF)_MFAP5, CAF_ACTA2, mast cell, follicular B cell, plasma B cell, Treg, CD4+ T cell, CD8+ T cell, monocyte-like cell, M1 macrophage, M2 macrophage and dendritic cell (Fig.
-- In GBC, 2,103 monocyte-like cells, 2,785 M1 macrophages and 5,948 M2 macrophages were identified (Fig.
-- The Gini index program was subsequently engaged to identify potential secreted protein candidates and we found that CD24, midkine (MDK) and SERPINA1 were elevated in epithelial cells with ErbB pathway mutations relative to cells without ErbB pathway mutations (Gini index >0.60, Fig.
-S100A7, the novel marker of squamous cell carcinoma of the lung, was not evident in gallbladder ASC (Fig.
-GBC1, 2 and 7 had a relatively closer transcriptomics distance than others on the epithelial cells at uniform manifold approximation and projection space.
-- Flow cytometry analysis of CD11b (pan-macrophage) and CD206 expression also supported that treatment with conditional media from mutated-ERBB3 GBC cells induced immunosuppressive macrophages.
+- Tumors with ErbB pathway mutations harbored a larger population of subtype 1 and 2 epithelial cells, Tregs, and M2 macrophages.
+- Increased MDK in these tumors interacted with its receptor LRP1 to promote immunosuppressive macrophage differentiation.
+- Crosstalk between macrophage-secreted CXCL10 and its receptor CXCR3 on Tregs was induced in GBC with ErbB pathway mutation.
 
 
-### Graphical Results
 
 ```{r magick_magrittr_gif, fig.height=6, fig.width=8, include=FALSE}
+### Graphical Results
+
 library(magick)
 library(magrittr)
 list.files(path="images/", pattern = 'Screen.*.png', full.names = TRUE) %>% 
         image_read() %>% 
         image_join() %>%
         image_animate(fps=0.5) %>% 
-        image_write("./images/mdk_gbc1.gif") 
+        image_write("./images/mdk_gbc.gif") 
 ```
 
 ```{r gifski_gif, eval=FALSE, fig.height=6, fig.width=8, include=FALSE}
 library(gifski)
 png_files <- list.files("images", pattern = "Screen.*.png", full.names = TRUE)
-gifski(png_files, gif_file = "./images/mdk_gbc2.gif", width = 800, height = 600, delay = 2)
+gifski(png_files, gif_file = "./images/mdk_gbc.gif", width = 800, height = 600, delay = 2)
 ```
 
  
-<a href=""><img src="images/mdk_gbc1.gif" alt="mdk_gbc_gif" width="100%" style="padding: 20px 10px 0px 10px; float: right;"/></a>
+<!-- <a href=""><img src="images/mdk_gbc.gif" alt="mdk_gbc_gif" width=80%" style="margin: 0px 10% 0px 10%; float: middle;"/></a> -->
 
-{data-width=250}
------------------------------------------------------------------------
 
 ### Conclusion
 
@@ -210,55 +217,35 @@ readRDS("RDataRDS/annotation.rds") %>%
   filter(section == "conclusion")
 ```
 
-This study has provided valuable insights into transcriptomic heterogeneity and the global cellular network in the TME, which coordinately functions to promote the progression of GBC with ErbB pathway mutations; thus, unveiling novel cellular and molecular targets for cancer therapy.
+This study provided valuable insights into transcriptomic heterogeneity and the global cellular network in the TME, which coordinately functions to promote the progression of GBC with ErbB pathway mutations; thus, unveiling novel cellular and molecular targets for cancer therapy.
+
+<br>
 
 ### References
 
-```{r include=FALSE}
+```{r eval=FALSE, include=FALSE}
 ## Word count
 paste("Total number of words for Intro, Methods, Results and Conclusion, respectively")
 
-intro <- "Growing evidence suggests that genomic alterations acquired during oncogenesis help tumor cells to escape immune surveillance.
-ErbB signaling is the most extensively mutated pathway that mediates anti-tumor immunity, and elevated ErbB-mutation levels are correlated with a worse outcome in patients with GBC.
- However, these studies generally relied on data from bulk tumor profiling, limiting their ability to accurately decipher tumor heterogeneity and genomic variations between individual cells, which are expected to contribute to tumor transformation and poor prognosis.
-The median survival of patients with GBC in general is less than 1 year, highlighting the extremely poor prognosis associated with this condition.
-Therefore, it is worthwhile to globally understand cellular heterogeneity and the intimate interactions underpinning tumor malignancy in order to develop new therapeutic approaches to improve treatment."
+intro <- "- Gallbladder carcinoma (GBC) is the most common cancer of the biliary tract and the sixth most common type of gastrointestinal cancer worldwide.
+- Growing evidence suggests that genomic alterations acquired during oncogenesis help tumor cells to escape immune surveillance.
+- ErbB signaling is the most extensively mutated pathway that mediates anti-tumor immunity
+- This study tested the hypothesis that individual cellular components of the tumor microenvironment (TME) in GBC function differentially to participate in ErbB pathway mutation-dependent tumor progression."
 
 lengths(gregexpr("\\W+", intro)) + 1
 
 
-methods <- "- Discovery cohort: 13 human GBCs and adjacent normal tissues
-  - with or without ErbB pathway mutations
-  - fresh biopsy samples from 13 primary GBC tumors and adjacent normal tissues
-- Single-cell RNA-sequencing
-- Bulk RNA-sequencing
- - immunohistochemical staining
- - immunofluorescence staining 
- - functional experiments
-- WES analysis
-  - reveal the genomic variations
-- Clustering 
-  - UMAP plot
-- Expression analysis
-  - Dot plot
-Distribution/Proportion
-  - Bar chart 
-- Enrichment
-  - Heatmap for relative enrichment"
+methods <- "- This study engaged single-cell RNA-sequencing to reveal transcriptomic heterogeneity and intercellular crosstalk from 13 human GBCs and adjacent normal tissues. 
+- WES analysis was performed to reveal the genomic variations related to tumor malignancy. 
+- A variety of bulk RNA-sequencing, immunohistochemical staining, immunofluorescence staining and functional experiments were employed to study the difference between tissues with or without ErbB pathway mutations."
 
 sum((lengths(gregexpr("\\W+", methods)) + 1))
 
 results <- "
-- Consistent with these data, immunofluorescence analysis also revealed that the expression level of MDK in epithelial cells was significantly higher in representative GBC1 tissue infiltrated with more CD68+ macrophages than the GBC8 sample (Fig.
-Again, 2 of the 3 cases (GBC1, 7) harbored large subcellular populations of Tregs, epithelial cells, and M2 macrophages compared to adjacent normal control tissue (Fig.
-- Consistent with this data, mRNA expression levels of M2 markers were increased, but M1 markers in macrophages were decreased after treatment with MDK or conditioned media from mutated-ERBB3 GBC cells (Fig.
-- Accordingly, the protein levels of M2 macrophage markers (CD163, CD206 and IL10) were induced after treatment with MDK or coculture with conditioned media from mutated-ERBB3 GBC cells (Fig.
-- To define the cellular composition in the TME and subpopulation structure of GBC, we performed graph-based clustering analysis on these cells and identified 16 distinct cell types based on known marker genes or specific genes expressed by each cell type, including epithelial cell, endothelial cell_VWF, endothelial cell_DCN, myofibroblast, cancer-associated fibroblast (CAF)_MFAP5, CAF_ACTA2, mast cell, follicular B cell, plasma B cell, Treg, CD4+ T cell, CD8+ T cell, monocyte-like cell, M1 macrophage, M2 macrophage and dendritic cell (Fig.
-- In GBC, 2,103 monocyte-like cells, 2,785 M1 macrophages and 5,948 M2 macrophages were identified (Fig.
-- The Gini index program was subsequently engaged to identify potential secreted protein candidates and we found that CD24, midkine (MDK) and SERPINA1 were elevated in epithelial cells with ErbB pathway mutations relative to cells without ErbB pathway mutations (Gini index >0.60, Fig.
-S100A7, the novel marker of squamous cell carcinoma of the lung, was not evident in gallbladder ASC (Fig.
-GBC1, 2 and 7 had a relatively closer transcriptomics distance than others on the epithelial cells at uniform manifold approximation and projection space.
-- Flow cytometry analysis of CD11b (pan-macrophage) and CD206 expression also supported that treatment with conditional media from mutated-ERBB3 GBC cells induced immunosuppressive macrophages."
+- Tumors with ErbB pathway mutations harbored a larger population of subtype 1 and 2 epithelial cells, Tregs, and M2 macrophages.
+- ErbB pathway mutations resulted in immunosuppressive macrophage differentiation and regulatory T cell activation, explaining the reduced anti-cancer immunity and worse overall survival observed in patients with these mutations.
+- Increased MDK in these tumors interacted with its receptor LRP1 to promote immunosuppressive macrophage differentiation.
+- Crosstalk between macrophage-secreted CXCL10 and its receptor CXCR3 on Tregs was induced in GBC with ErbB pathway mutation."
 sum((lengths(gregexpr("\\W+", results)) + 1))
 
 conclusion <- "This study has provided valuable insights into transcriptomic heterogeneity and the global cellular network in the TME, which coordinately functions to promote the progression of GBC with ErbB pathway mutations; thus, unveiling novel cellular and molecular targets for cancer therapy"
@@ -271,4 +258,6 @@ paste("Total= ",
     (lengths(gregexpr("\\W+", results)) + 1),
     (lengths(gregexpr("\\W+", conclusion)) + 1))))
 ```
+
+
 

@@ -51,7 +51,7 @@ page %>%
 # head(text, 2)
 
 
-## Abstrcat
+## Abstract
 
 text <- "Epithelial subtype 1, 2 and 3 were mainly found in the adenocarcinoma and subtype 4 was present in adenosquamous carcinoma.
 Tumors with ErbB pathway mutations harbored a larger population of subtype 1 and 2 epithelial cells, Tregs, and M2 macrophages.
@@ -83,39 +83,38 @@ mutate(value =  round(100 * value, digits = 4),
        section = "abstract") %>% 
 select(section, value, sentence) %>% 
 dplyr::arrange(-value)
+```
 
+
+```{r}
 
 ## Introduction
 
-text <- "Introduction
-Gallbladder carcinoma (GBC) is the most common cancer of the biliary tract and the sixth most common type of gastrointestinal cancer worldwide.[1],[2] Gallbladder adenocarcinoma (AC) accounts for more than 85% of GBCs, which are characterized by high intra-tumoral heterogeneity and poor prognosis, whereas adenosquamous carcinoma (ASC: <5%) and squamous carcinoma (<2%) constitute a small proportion of GBCs, for which there is insufficient research information available to guide treatment.[3],[4] Even though surgical treatment is commonly used for GBC, the population amenable to surgical treatment is limited, as most patients are diagnosed at advanced stages. The median survival of patients with GBC in general is less than 1 year, highlighting the extremely poor prognosis associated with this condition.4,  5,  6,  7 Given GBCs are sophisticated ecosystems characterized by spatiotemporal interactions between heterogeneous cell types, such as malignant cells and stromal cells in the tumor microenvironment (TME), their heterogeneity has evidently dampened the efficacy of anti-tumor treatments that target single specific cells and/or molecules but not multiple key elements simultaneously.8,  9,  10,  11,  12,  13,  14,  15 Therefore, it is worthwhile to globally understand cellular heterogeneity and the intimate interactions underpinning tumor malignancy in order to develop new therapeutic approaches to improve treatment.
+text <- "Gallbladder carcinoma (GBC) is the most common cancer of the biliary tract and the sixth most common type of gastrointestinal cancer worldwide.[1],[2] Gallbladder adenocarcinoma (AC) accounts for more than 85% of GBCs, which are characterized by high intra-tumoral heterogeneity and poor prognosis, whereas adenosquamous carcinoma (ASC: <5%) and squamous carcinoma (<2%) constitute a small proportion of GBCs, for which there is insufficient research information available to guide treatment.[3],[4] Even though surgical treatment is commonly used for GBC, the population amenable to surgical treatment is limited, as most patients are diagnosed at advanced stages. The median survival of patients with GBC in general is less than 1 year, highlighting the extremely poor prognosis associated with this condition.4,  5,  6,  7 Given GBCs are sophisticated ecosystems characterized by spatiotemporal interactions between heterogeneous cell types, such as malignant cells and stromal cells in the tumor microenvironment (TME), their heterogeneity has evidently dampened the efficacy of anti-tumor treatments that target single specific cells and/or molecules but not multiple key elements simultaneously.8,  9,  10,  11,  12,  13,  14,  15 Therefore, it is worthwhile to globally understand cellular heterogeneity and the intimate interactions underpinning tumor malignancy in order to develop new therapeutic approaches to improve treatment.
 Oncogenesis is a chronic, multistep pathogenesis that involves a number of genetic and epigenetic alterations. Growing evidence suggests that genomic alterations acquired during oncogenesis help tumor cells to escape immune surveillance.[2] In our previous studies, we performed whole-exome sequencing (WES) in a larger number of patients with GBC and identified that ErbB signaling is the most extensively mutated pathway that mediates anti-tumor immunity, and elevated ErbB-mutation levels are correlated with a worse outcome in patients with GBC.[2],[16] However, these studies generally relied on data from bulk tumor profiling, limiting their ability to accurately decipher tumor heterogeneity and genomic variations between individual cells, which are expected to contribute to tumor transformation and poor prognosis.
-The emergence of single-cell RNA-sequencing (scRNA-seq) approaches has allowed us to visualize expression profiling of specific cell populations.17,  18,  19,  20,  21,  22,  23 In particular, clinical application of the scRNA-seq on tumor biopsies has helped establish a new immunotherapeutic strategy based on the genetic alterations identified in immune cells.24,  25,  26,  27,  28,  29,  30 Of note, the advanced technology of newly developed data sets has greatly improved our understanding of the mechanisms that regulate intercellular interactions between tumor cells and stromal cells at the single-cell level.[31],[32] To reveal intra-tumoral cellular heterogeneity and intercellular crosstalk associated with genetic signatures, we took advantage of the newly created scRNA-seq technology to investigate genetic variations in paired primary GBC tumors and adjacent normal tissues. Herein, we present unprecedentedly large-scale transcriptomic data on GBC, unveiling the altered genetic properties of individual tumor cells and immune cells that cooperate to drive malignant transformation, and providing a valuable resource for future research.
-Patients and methods
-
-Human GBC samples
-Eleven patients were pathologically diagnosed with gallbladder AC, and 2 were diagnosed with ASC at Xinhua Hospital, Shanghai Jiao Tong University School of Medicine (Fig. 1A). The available clinicopathological features of these patients were summarized in Table S1, and these tissue samples were designated as the discovery cohort. Formalin-fixed paraffin-embedded tissue blocks from 41 patients with AC and 11 with ASC were retrospectively collected and comprised the validation cohort (Fig. 1B, Table S2), which was derived from the previously enrolled WES study cohort.[2] All patients had accepted the informed consent forms, and the study was approved by the Research and Ethics Committee of Xinhua Hospital (No. XHEC-D-2018-050).
-Figure thumbnail gr1"
+The emergence of single-cell RNA-sequencing (scRNA-seq) approaches has allowed us to visualize expression profiling of specific cell populations.17,  18,  19,  20,  21,  22,  23 In particular, clinical application of the scRNA-seq on tumor biopsies has helped establish a new immunotherapeutic strategy based on the genetic alterations identified in immune cells.24,  25,  26,  27,  28,  29,  30 Of note, the advanced technology of newly developed data sets has greatly improved our understanding of the mechanisms that regulate intercellular interactions between tumor cells and stromal cells at the single-cell level.[31],[32] To reveal intra-tumoral cellular heterogeneity and intercellular crosstalk associated with genetic signatures, we took advantage of the newly created scRNA-seq technology to investigate genetic variations in paired primary GBC tumors and adjacent normal tissues. Herein, we present unprecedentedly large-scale transcriptomic data on GBC, unveiling the altered genetic properties of individual tumor cells and immune cells that cooperate to drive malignant transformation, and providing a valuable resource for future research."
   
 intro  <- lexRankr::lexRank(text,
                 docId = rep(1, length(text)),
-                n = 2,
+                n = 3,
                 continuous = TRUE) %>%
 dplyr::mutate(sentenceId = as.numeric(stringr::str_remove_all(sentenceId, ".*_"))) %>%
        mutate(value =  round(100 * value, digits = 4),
               section = "intro") %>% 
        select(section, value, sentence) %>% 
 dplyr::arrange(-value)
+```
 
+```{r}
 
 ## Research and Sequencing Strategy
 
-text <- "We engaged single-cell RNA-sequencing to reveal transcriptomic heterogeneity and intercellular crosstalk from 13 human GBCs and adjacent normal tissues. In addition, we performed WES analysis to reveal the genomic variations related to tumor malignancy. A variety of bulk RNA-sequencing, immunohistochemical staining, immunofluorescence staining and functional experiments were employed to study the difference between tissues with or without ErbB pathway mutations."
+text <- "We engaged single-cell RNA-sequencing to reveal transcriptomic heterogeneity and intercellular crosstalk from 13 human GBCs and adjacent normal tissues. In addition, we performed WES analysis to reveal the genomic variations related to tumor malignancy. A variety of bulk RNA-sequencing, immunohistochemical staining, immunofluorescence staining and functional experiments were employed to study the difference between tissues with or without ErbB pathway mutations"
 
 ## Rank sentences
 methods <- lexRankr::lexRank(text,
                   docId = rep(1, length(text)),
-                  n = 5,
+                  n = 2,
                   continuous = TRUE) %>%
   dplyr::mutate(sentenceId = as.numeric(stringr::str_remove_all(sentenceId, ".*_"))) %>%
        mutate(value =  round(100 * value, digits = 4),
@@ -123,6 +122,9 @@ methods <- lexRankr::lexRank(text,
        select(section, value, sentence) %>% 
   dplyr::arrange(-value)
 
+```
+
+```{r}
 
 library(DiagrammeR)
 library(DiagrammeRsvg)
@@ -139,8 +141,6 @@ fontname = Helvetica,
 penwidth = 2.0] 
 
 edge [arrowhead = diamond]
-
-# We engaged single-cell RNA-sequencing to reveal transcriptomic heterogeneity and intercellular crosstalk from 13 human GBCs and adjacent normal tissues. In addition, we performed WES analysis to reveal the genomic variations related to tumor malignancy. A variety of bulk RNA-sequencing, immunohistochemical staining, immunofluorescence staining and functional experiments were employed to study the difference between tissues with or without ErbB pathway mutations.
 
 A [label = 'TAXONOMIC \nPROFILING FROM \nMICROBIOME DATA', fillcolor = white, penwidth = 5.0]
 B [label = 'Complex Data from \nSequencing Platforms\n(*.fastq.gz)', shape = folder]
