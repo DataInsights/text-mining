@@ -1,5 +1,5 @@
 ---
-title: "Pubmed Literature Tracking in R"
+title: "Text Mining in R"
 subtitle: "Searching and visually comparing different fields"
 author: "Teresia Mrema-Buza"
 date: "<strong>Last Updated</strong>: `r Sys.Date()`"
@@ -19,7 +19,7 @@ output:
     toc_depth: 6
     favicon: "favicon.ico"
     footnotes_inline: false
-    split_bib: false
+    split_bib: true
     repo:
       base: https://github.com/DataInsights/text-mining/
       branch: main
@@ -63,7 +63,7 @@ library(tidyverse, suppressPackageStartupMessages())
 ```
 
 
-# Getting PubMed Entrez Data
+# Pubmed Literature Tracking in R
 ```{r fig.cap="Microbiome Workflow", include=FALSE}
 library(DiagrammeR)
 library(DiagrammeRsvg)
@@ -83,15 +83,6 @@ mermaidgraph
 ```
 
 
-<a href=""><img src="img/pubmed_lit_search.png" alt="Book cover" width="40%" style="padding: 0px 0px 50px 0px; float: right;"/></a>
-
-## Quick Glimpse {-}
-Investigating the role of microbial communities in health and disease requires a thorough knowledge of the entire analytical process. Using wrong approaches can cost a significant amount of dollars and lengthy process to achieve the desired results. This is <b>PART 4</b> of the practical user guides intended to provide analytical support to the microbiome research community. The entire guide is reproducible, allowing users to easily follow along. If interested, user may use this model to publish their findings in a book format.
-
-## Structure of this guide {-}
-This guide is divided into chapters to facilitate easy navigation. Each chapter contains several sections as displayed in the navigation bars on the left and right. Click the hyper-linked text if you want to jump into a specific chapter or section.
-
-## Code availability {-}
-The code that generated this guide is available at a public [GitHub repository](https://github.com/DataInsights/pubmed-tracking/) or via a [GH-Page](https://tmbuza.github.io/pubmed-tracking/). If interested you can request a consulting service by contacting the developer of this repo using <a href="https://complexdatainsights.com/contact-us">this contact form</a>. 
+<!-- <a href=""><img src="img/pubmed_lit_search.png" alt="Book cover" width="40%" style="padding: 0px 0px 50px 0px; float: right;"/></a> -->
 
 

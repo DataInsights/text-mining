@@ -1,0 +1,33 @@
+# (PART) WORD COUNT {-}
+
+# Section Word Count
+- Introduction
+- Methods
+- Results
+- Conclusion
+
+```{r}
+paste("Total number of words for Intro, Methods, Results and Conclusion, respectively")
+
+intro <- ""
+
+lengths(gregexpr("\\W+", intro)) + 1
+
+
+methods <- ""
+
+sum((lengths(gregexpr("\\W+", methods)) + 1))
+
+results <- ""
+sum((lengths(gregexpr("\\W+", results)) + 1))
+
+conclusion <- "T"
+sum((lengths(gregexpr("\\W+", conclusion)) + 1))
+
+paste("Total= ", 
+    
+    (sum((lengths(gregexpr("\\W+", intro)) + 1), 
+    (lengths(gregexpr("\\W+", methods)) + 1), 
+    (lengths(gregexpr("\\W+", results)) + 1),
+    (lengths(gregexpr("\\W+", conclusion)) + 1))))
+```

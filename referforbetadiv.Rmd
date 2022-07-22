@@ -1,0 +1,320 @@
+# (PART) BETA DIVERSITY {-}
+
+# Data transformation
+> Note that we have relative abundance not raw abundance. This compositional data need to be transformed with special methods such as inverse hyperbolic sine (asinh) or the arcsine transformation are suggested when dealing with zeros [@Gloor2017]
+Logratio analysis and its associated distance measures satisfy these conditions. 
+
+## Arc sine (asin) transformation
+
+```{r}
+shared_matrix <-readRDS("../iMAP-part3/RDataRDS/composite.rds") %>% 
+  dplyr::select(sample_id, otu, rel_abund) %>%
+  pivot_wider(id_cols = sample_id, names_from = otu,values_from = rel_abund) %>%
+  tibble::column_to_rownames("sample_id")
+```
+
+```{r}
+x <- shared_matrix
+y <- x/max(x)
+df_asin <- round(asin(y), 6)
+df_asin <- as.matrix(df_asin)
+saveRDS(df_asin, "RDataRDS/df_asin.rds")
+df_asin[,1:5]
+```
+
+## Inverse hyperbolic sine (asinh) transformation
+
+```{r}
+x <- shared_matrix
+y <- x/max(x)
+df_asinh <- round(asinh(y), 6)
+df_asinh <- as.matrix(df_asinh)
+saveRDS(df_asinh, "RDataRDS/df_asinh.rds")
+df_asinh[,1:5]
+```
+
+# Compute Distance on Transformed Data
+- Here we use vegdist function on arcsine transformed data.
+- There are other functions out there, gooling can help.
+
+## Bray-Curtis Dissimilarities
+```{r}
+asin_bray_dist <- vegan::vegdist(t(df_asin), method = "bray")
+asin_bray_dist[is.na(asin_bray_dist)] = 0
+saveRDS(asin_bray_dist, file = "RDataRDS/asin_bray_dist.rds")
+```
+
+
+## Aitchison Distance
+- Requires count
+
+
+### Compute PCA on Transformed Data
+
+```{r echo=FALSE, warning=FALSE}
+# pca_clr <- rda(t(df_clr))
+df_clr <- as.matrix(otu_table(ps_clr))
+pca_clr <- rda(t(df_clr))
+library(robCompositions)
+clr_aitch_dist <- robCompositions::aDist(pca_clr$CA$u )
+clr_aitch_dist[is.na(clr_aitch_dist)] = 0
+saveRDS(clr_aitch_dist, file = "RDataRDS/clr_aitch_dist.rds")
+```
+
+# Dendrogram or Hierarchical Clustering {#cluster_dendrogram}
+
+## Bray-Curtis Dissimilarities
+- Using average distance
+- Colored by Group variable
+
+
+```{r}
+asin_bray_dist <- readRDS("RDataRDS/asin_bray_dist.rds")
+asin_bray_average <- as.dendrogram(hclust(asin_bray_dist, method = "average"))
+sampmeta <- readRDS("RDataRDS/samplemetadata_stats.rds")
+# color <- c(AUMC = "red", STM = "blue", UOO = "magenta")
+color <- c(Group1 = "red", Group2 = "blue")
+labels_colors(asin_bray_average) <- color[sampmeta$Group][order.dendrogram(asin_bray_average)]
+plot(asin_bray_average)
+```
+
+> Hypothetically, the composition of these samples differ based on the Bray-Curtis dissimilarities. The difference can be explored further using ordination (next section).
+
+## Dendrogram Using  Aitchison Distances
+- Colored by female variable
+- Using average distance on asin transformed data.
+
+```{r}
+clr_aitch_dist <- readRDS("RDataRDS/clr_aitch_dist.rds")
+clr_aitch_average <- as.dendrogram(hclust(clr_aitch_dist, method = "average"))
+sampmeta <- readRDS("RDataRDS/samplemetadata_stats.rds")
+# color <- c(AUMC = "red", STM = "blue", UOO = "magenta")
+color <- c(Group1 = "red", Group2 = "blue")
+labels_colors(clr_aitch_average) <- color[sampmeta$Group][order.dendrogram(clr_aitch_average)]
+plot(clr_aitch_average)
+```
+> Hypothetically, the composition of these samples differ based on Aitchison Distances measures. The difference can be explored further using ordination (next section).
+
+# Bray-Curtis Ordination {#bray_ord}
+
+## Add Transformed data to Phylo object
+```{r}
+load("RDataRDS/Transformed_data_files.RData", verbose = TRUE)
+```
+
+```{r}
+abundrel <- otu_table(ps_rel)
+taxarel <- otu_table(ps_rel)
+treerel<- phy_tree(ps_rel)
+metarel <- sample_data(ps_rel)
+ps4betadiv <- phyloseq::merge_phyloseq(abundrel, taxarel, treerel, metarel)
+ps4betadiv
+saveRDS(ps4betadiv, "RDataRDS/ps4betadiv.rds")
+```
+
+## Ordination Methods
+
+```{r}
+ord_methods <- phyloseq::ordinate("list")
+ord_methods
+```
+
+## PCA: Principal Component Analysis
+
+> RDA (redundancy analysis) method in vegan package performs principal components analysis (PCA).
+### Ordination
+
+Using Arcsine transformed data
+
+```{r}
+set.seed(23)
+ps4betadiv <- readRDS("RDataRDS/ps4betadiv.rds")
+ps_pca = phyloseq::ordinate(ps4betadiv, "RDA", "bray")
+p <- phyloseq::plot_ordination(ps4betadiv, ps_pca, color="Group", shape="Group")
+p + geom_point(size=4, alpha=0.75) + 
+  scale_colour_brewer(type="qual", palette="Set1") + 
+  ggtitle("PCA on Bray-Curtis Distance")
+```
+
+### PCA Scree plot
+```{r}
+phyloseq::plot_scree(ps_pca) + 
+  geom_bar(stat="identity", fill = "steelblue") + theme_bw() +
+  labs(x = "\nPrincipal Components", y = "Explained Variance\n")
+```
+
+## PCoA: Principal Coordinate Analysis (MDS)
+> MDS or PCoA method performs multidimensional scaling (MDS) or principal coordinate analysis (PCoA).
+### PCoA Ordination
+
+```{r}
+set.seed(24)
+ps4betadiv <- readRDS("RDataRDS/ps4betadiv.rds")
+ps_pcoa = phyloseq::ordinate(ps4betadiv, "PCoA", "bray", weighted=TRUE)
+p <- phyloseq::plot_ordination(ps4betadiv, ps_pcoa, color="Group", shape="Group")
+p + geom_point(size=4, alpha=0.75) + 
+  scale_colour_brewer(type="qual", palette="Set1") + 
+  ggtitle("PCoA (MDS) on Bray-Curtis distance")
+```
+
+
+### PCoA (MDS) Scree plot
+```{r}
+phyloseq::plot_scree(ps_pcoa) + 
+  geom_bar(stat="identity", fill = "steelblue") + theme_bw() +
+  labs(x = "\nPrincipal Coordinate", y = "Explained Variance\n") 
+```
+
+
+## NMDS: Nonmetric Multidimensional Scaling
+> NMDS method performs non-multidimensional scalin
+### NMDS ordination
+
+```{r message=FALSE, warning=FALSE}
+set.seed(25)
+ps4betadiv <- readRDS("RDataRDS/ps4betadiv.rds")
+ps_nmds = phyloseq::ordinate(ps4betadiv, "NMDS", "bray", weighted=TRUE)
+p <- phyloseq::plot_ordination(ps4betadiv, ps_nmds, color="Group", shape="Group")
+p + geom_point(size=4, alpha=0.75) + 
+  scale_colour_brewer(type="qual", palette="Set1") + 
+  ggtitle("NMDS on Bray-Curtis distance")
+```
+
+
+### PCoA (NMDS) Stress Plot
+
+```{r}
+stressplot(ps_nmds)
+```
+
+## DPCoA: Double Principal Coordinate Analysis
+- DPCoA method calculates double principle coordinate analysis (DPCoA) using phylogenetic distance.
+
+### Weighted DPCoA Ordination
+```{r}
+set.seed(26)
+ps4betadiv <- readRDS("RDataRDS/ps4betadiv.rds")
+ps_dpcoa_wted = phyloseq::ordinate(ps4betadiv, "DPCoA", "wunifrac")
+p <- phyloseq::plot_ordination(ps4betadiv, ps_dpcoa_wted, color="Group", shape="Group")
+p + geom_point(size=4, alpha=0.75) + 
+  scale_colour_brewer(type="qual", palette="Set1") + 
+  ggtitle("Double PCoA on Weighted Unifrac Distance")
+```
+
+### DPCoA Scree plot
+```{r}
+phyloseq::plot_scree(ps_dpcoa_wted) + 
+  geom_bar(stat="identity", fill = "steelblue") + theme_bw() +
+  labs(x = "\nPrincipal Coordinate", y = "Explained Variance\n") 
+```
+
+### Unweighted DPCoA Ordination
+```{r}
+set.seed(26)
+ps4betadiv <- readRDS("RDataRDS/ps4betadiv.rds")
+ps_dpcoa_unwted = phyloseq::ordinate(ps4betadiv, "DPCoA", "unifrac")
+p <- phyloseq::plot_ordination(ps4betadiv, ps_dpcoa_unwted, color="Group", shape="Group")
+p + geom_point(size=4, alpha=0.75) + 
+  scale_colour_brewer(type="qual", palette="Set1") + 
+  ggtitle("Double PCoA on Unweighted Unifrac Distance")
+```
+
+### Unweighted DPCoA Scree plot
+```{r}
+phyloseq::plot_scree(ps_dpcoa_unwted) + 
+  geom_bar(stat="identity", fill = "steelblue") + theme_bw() +
+  labs(x = "\nPrincipal Coordinate", y = "Explained Variance\n") 
+```
+
+
+## Compare Different Ordination Methods
+
+```{r fig.height=7, fig.width=15}
+library(plyr)
+dist = "bray"
+ord_meths = c("RDA", "PCoA", "NMDS", "DCA", "CCA",  "DPCoA")
+plist = llply(as.list(ord_meths), function(i, physeq, dist){
+        ordi_plot = ordinate(physeq, method=i, distance = dist)
+        plot_ordination(
+          physeq, ordi_plot, "samples", 
+          color = "Group") + 
+          theme(text = element_text(size = 14)) + 
+          geom_point(size=4) }, ps4betadiv, dist)
+library(ggpubr)
+ggarrange(plist[[1]], plist[[2]], plist[[3]], plist[[4]], plist[[5]], plist[[6]], ncol = 3, nrow = 2, common.legend = TRUE, legend = "right" )
+```
+
+
+## Add Polygons on Ordination
+```{r fig.height=7, fig.width=15}
+dist = "bray"
+ord_meths = c("RDA", "PCoA", "NMDS", "DCA", "CCA",  "DPCoA")
+names(plist) <- ord_meths
+pdataframe = ldply(plist, function(x){
+    df = x$data[, 1:2]
+    colnames(df) = c("Axis_1", "Axis_2")
+    return(cbind(df, x$data))
+})
+names(pdataframe)[1] = "method"
+p <- ggplot(pdataframe, aes(Axis_1, Axis_2, color=Group, shape=Group, fill=Direction)) +
+  geom_point(size=6) + 
+  geom_polygon() +
+  facet_wrap(~method, scales="free") +
+  scale_fill_brewer(type="qual", palette="Set2") +
+  scale_colour_brewer(type="qual", palette="Set2") + 
+  theme(text = element_text(size = 16)) + 
+  facetsize14
+p
+```
+
+# (PART) BETA RAREFACTION ON PS {-}
+### Sample Sums
+```{r}
+sample_sums(ps)
+```
+
+###  Perform multiple Rarefaction e.g 20 Seq 10 Times
+
+```{r}
+# Perform multiple rarefaction (sample 20 sequences from each sample, repeat the procedure 10 times)
+samp10 <- phyloseq_mult_raref(ps, SampSize = 20, iter = 10)
+sample_sums(samp10[[1]])  # rarefied data
+```
+### Unifrac Sample dissimilarity for each iteration
+```{r include=FALSE}
+# Estimate sample dissimilarity independently for each iteration
+samp10_dis <- mult_dissim(samp10, method = "unifrac", average = F)
+samp10_dis[[1]]   # unweighted UniFrac distances for the first rarefaction iteration
+```
+
+### Unifrac Average sample dissimilarities
+```{r include=FALSE}
+# Average sample dissimilarities over all rarefaction iterations
+samp10_dis_avg <- mult_dissim(samp10, method = "unifrac", average = T)
+samp10_dis_avg    # mean unweighted UniFrac distances
+```
+
+# (PART) BETA HYPOTHESIS TESTING {-}
+# Hypothesis Testing for Beta Diversity
+
+## ADONIS test
+```{r}
+# vegan::adonis(df_arc_bray_dist ~ phyloseq::sample_data(ps)$Group)
+```
+
+## Homogeneity: Dispersion test
+```{r}
+dispr <- vegan::betadisper(asin_bray_dist, phyloseq::sample_data(ps)$Group)
+dispr$vectors[1:5, 1:3]
+plot(dispr, main = "Homogeneity of multivariate dispersions", sub = "Aitchison Distance: Ordination Centroids and Dispersion. ")
+## Dispersion Boxplot
+boxplot(dispr, main = "", xlab = "")
+```
+
+## PERMANOVA: Permutation test for homogeneity
+- Use the permutational multivariate analysis of variance (PERMANOVA)
+- Accept or reject the null hypothesis.
+.
+```{r}
+permutest(dispr)
+```

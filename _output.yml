@@ -20,7 +20,7 @@ bookdown::bs4_book:
   toc_depth: 3
   favicon: "favicon.ico"
   footnotes_inline: false
-  split_bib: false
+  split_bib: true
   repo:
     base: https://github.com/DataInsights/text-mining/
     branch: main
