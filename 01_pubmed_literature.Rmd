@@ -8,8 +8,46 @@ library(tidyverse)
 library(rentrez)
 library(glue)
 
-read_csv("data/PubMed_Timeline_Results_by_Year.csv",
-         skip=1) %>%
+microbiome <- read_csv("../Datasets/microbiome_metagenomic_PubMed_Timeline.csv",
+         skip=1, show_col_types = F) %>% 
+  filter(Year != 2023) %>% 
+  mutate(Omics = "Microbiome")
+
+genomics <- read_csv("../Datasets/genomics_PubMed_Timeline.csv",
+         skip=1, show_col_types = F) %>% 
+  filter(Year != 2023) %>% 
+  mutate(Omics = "Genomics")
+
+metabolomics <- read_csv("../Datasets/metabolomics_PubMed_Timeline.csv",
+         skip=1, show_col_types = F) %>% 
+  filter(Year != 2023) %>% 
+  mutate(Omics = "Metabolomics")
+
+proteomics <- read_csv("../Datasets/proteomics_PubMed_Timeline.csv",
+         skip=1, show_col_types = F) %>% 
+  filter(Year != 2023) %>% 
+  mutate(Omics = "Proteomics")
+
+phenomics <- read_csv("../Datasets/phenomics_PubMed_Timeline.csv",
+         skip=1, show_col_types = F) %>% 
+  filter(Year != 2023) %>% 
+  mutate(Omics = "Phenomics")
+
+lipidomics <- read_csv("../Datasets/lipidomics_PubMed_Timeline.csv",
+         skip=1, show_col_types = F) %>% 
+  filter(Year != 2023) %>% 
+  mutate(Omics = "Lipidomics")
+
+transcriptomics <- read_csv("../Datasets/transcriptomics_PubMed_Timeline.csv",
+         skip=1, show_col_types = F) %>% 
+  filter(Year != 2023) %>% 
+  mutate(Omics = "Transcriptomics")
+
+do.call("rbind", list(microbiome, genomics, metabolomics, proteomics, phenomics, lipidomics, transcriptomics)) %>% 
+  write_csv("../Datasets/omics_pubmed_timeline.csv")
+```
+
+```{r}
   ggplot(aes(x=Year, y=Count)) +
   geom_line() +
   theme_classic()

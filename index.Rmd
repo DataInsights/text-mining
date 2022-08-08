@@ -64,25 +64,42 @@ library(tidyverse, suppressPackageStartupMessages())
 
 
 # Pubmed Literature Tracking in R
-```{r fig.cap="Microbiome Workflow", include=FALSE}
+```{r pubmed, fig.cap="PubMed Search Workflow"}
 library(DiagrammeR)
 library(DiagrammeRsvg)
 
 mermaidgraph <- mermaid("graph TD
-A[NCBI PubMed Database] --> |Search Term| B[Microbiome]
-B --> |Search Results| C[Indexed Papers in PubMed]
-C --> |Download results| D[Results by Year in CSV format]
-D --> |Filename| E[PubMed_Timeline_Results_by_Year.csv]
-E --> F[Save file in data directory]
-F -.-> G[Further Analysis in R]
+A(OMICS PUBLICATION STATISTICS) --> A0{NCBI PubMed Database}
+A0 --> A1[Microbiome OR Metabolomics]
+A0 --> A2[Genomics]
+A0 --> A3[Proteomics]
+A0 --> A4[Metabolomics]
+A0 --> A5[Phenomics]
+A0 --> A6[Transcriptomics]
 
-", height = 800, width = 1000)
+
+subgraph ARTICLE SEARCH USING OMICS KEYWORDS
+A1 --> B{Indexed Papers in PubMed}
+A2 --> B
+A3 --> B
+A4 --> B
+A5 --> B
+A6 --> B
+
+B --> |Download results| C[Results by Year in CSV format]
+end
+
+subgraph SEARCH RESULTS
+C --> |Filename| D[PubMed_Timeline_Results_by_Year.csv]
+D --> E[Save file in data directory]
+E -.-> F[Further Analysis]
+end
+
+", height = 600, width = 600)
 
 mermaidgraph
 
 ```
 
-
-<!-- <a href=""><img src="img/pubmed_lit_search.png" alt="Book cover" width="40%" style="padding: 0px 0px 50px 0px; float: right;"/></a> -->
 
 
