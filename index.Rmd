@@ -5,56 +5,90 @@ author: "Teresia Mrema-Buza"
 date: "<strong>Last Updated</strong>: `r Sys.Date()`"
 site: bookdown::bookdown_site
 knit: bookdown::render_book
-output: 
-  flexdashboard::flex_dashboard:
-    orientation: columns
-    # vertical_layout: fill
-    # vertical_layout: fill
-    vertical_layout: scroll
-  # html_document:
-  # pdf_document:
-  # word_document:
+output:
   bookdown::bs4_book:
-    template: bs4_text_mining_template.html
-    toc_depth: 6
-    favicon: "favicon.ico"
-    footnotes_inline: false
-    split_bib: true
-    repo:
-      base: https://github.com/DataInsights/text-mining/
-      branch: main
-      # subdir: book
-      icon: "fas fa-air-freshener"
-    theme:
-      fg: "black"
-      bg: "#FFFEFA"
-      primary: "#277DB0"
-      secondary: "#277DB0"
-      success: "#277DB0"
-      info: "#277DB0"
-      warning: "#277DB0"
-      danger: "#277DB0"
-      base_font:
-        google: Sen
-      heading_font:
-        google:
-          family: Bitter
-          wght: 300
-      code_font:
-        google:
-          # arguments to sass::font_google()
-          family: DM Mono
-          local: false
-css:
-- style.css
+    includes:
+      in_header:
+    template: bs4_template.html
+        
+  bookdown::gitbook:
+    includes:
+      in_header: header.html
+    config: 
+      toc:
+       collapse: 
+      search: yes
+      fontsettings:
+        size: 2
+    split_by: section
+    split_bib: no
+    df_print: paged
+    number_sections: true
+    css:
+    - css/style.css
+    - style.css
+    
+  html_document:
+    code_folding: hide
+    
+  bookdown::html_document2:
+    code_folding: hide
+    
+  bookdown::pdf_book:
+    config:
+      toc = true
+      toc_depth = 2
+      number_sections = true
+      fig_caption = true
+      keep_tex = no
+      pandoc_args = null
+      toc_unnumbered = no
+      toc_appendix = no
+      toc_bib = no 
+      quote_footer = null
+      highlight_bw = true
+      latex_engine = xelatex
+      df_print = kable
+      base_format = rmarkdown::pdf_document
+  includes:
+    in_header: 
+    - latex/header.tex
+    - latex/preamble.tex
+documentclass: book
+classoption: openany #remove empty pages in pdf doc
 bibliography:
-- library/articles.bib
-- library/software.bib
+- library/book.bib
+- library/packages.bib
+- library/microbiome.bib
+- library/software.bib 
 citation_package:
 - natbib
 - biblatex
 - amsplain
----
+colorlinks: true
+css:
+- css/style.css
+always_allow_html: true
+fig_caption: true
+fontsize: 12pt
+geometry: margin=1in
+indent: false
+keep_tex: true
+link-citations: true
+mainfont: Times New Roman
+biblio-style: apalike
+spacing: double
+header-includes: 
+- \usepackage{setspace}
+- \newpage
+- \newenvironment{tmbinfo}[0]{}{}
+- \renewenvironment{tmbinfo}[0]{}{}
+- \newenvironment{tmbalert}[0]{}{}
+- \renewenvironment{tmbalert}[0]{}{}
+- \newenvironment{tmbshare}[0]{}{}
+- \renewenvironment{tmbshare}[0]{}{}
+description: 
+--
 
 ```{r setup, include=FALSE}
 source("R/common.R")
