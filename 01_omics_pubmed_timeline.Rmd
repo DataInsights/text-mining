@@ -6,6 +6,11 @@
 ```{r}
 library(tidyverse)
 
+tumorlympho <- read_csv("data/Cancer_PubMed_Timeline_Results_by_Year.csv",
+         skip=1, show_col_types = F) %>% 
+  filter(Year != 2023) %>% 
+  mutate(Omics = "TumorLympho")
+
 microbiome <- read_csv("../Datasets/microbiome_metagenomic_PubMed_Timeline.csv",
          skip=1, show_col_types = F) %>% 
   filter(Year != 2023) %>% 
@@ -41,7 +46,7 @@ transcriptomics <- read_csv("../Datasets/transcriptomics_PubMed_Timeline.csv",
   filter(Year != 2023) %>% 
   mutate(Omics = "Transcriptomics")
 
-do.call("rbind", list(microbiome, genomics, metabolomics, proteomics, phenomics, lipidomics, transcriptomics)) %>% 
+do.call("rbind", list(tumorlympho, microbiome, genomics, metabolomics, proteomics, phenomics, lipidomics, transcriptomics)) %>% 
   write_csv("../Datasets/omics_pubmed_timeline.csv")
 
 read_csv("../Datasets/omics_pubmed_timeline.csv") %>% 
@@ -52,11 +57,12 @@ read_csv("../Datasets/omics_pubmed_timeline.csv") %>%
 
 
 ## Using `rentrez` package
-```{r eval=FALSE, include=FALSE}
+```{r eval=FALSE, echo=TRUE}
 library(rentrez)
 library(glue)
 
 year <- 1991:2022
+tumorlympho_search <- glue("cancer OR tumor AND lymphocyte AND {year}[PDAT]")
 microbiome_search <- glue("microbiome OR metagenomics OR metagenome AND {year}[PDAT]")
 genomics_search <- glue("genomics AND {year}[PDAT]")
 proteomics_search <- glue("proteomics AND {year}[PDAT]")
@@ -68,6 +74,7 @@ transcriptomics_search <- glue("transcriptomics AND {year}[PDAT]")
 all_search <- glue("{year}[PDAT]")
 
 omics_search_counts <- tibble(year = year,
+       tumorlympho_search = tumorlympho_search,
        microbiome_search = microbiome_search,
        genomics_search = genomics_search,
        proteomics_search = proteomics_search,
@@ -76,7 +83,8 @@ omics_search_counts <- tibble(year = year,
        phenomics_search = phenomics_search,
        transcriptomics_search = transcriptomics_search,
        all_search = all_search) %>%
-  mutate(microb_res = map_dbl(microbiome_search, ~entrez_search(db="pubmed", term=.x)$count),
+  mutate(tumlymph_res = map_dbl(tumorlympho_search, ~entrez_search(db="pubmed", term=.x)$count),
+         microb_res = map_dbl(microbiome_search, ~entrez_search(db="pubmed", term=.x)$count),
          genom_res = map_dbl(genomics_search, ~entrez_search(db="pubmed", term=.x)$count),
          proteo_res = map_dbl(proteomics_search, ~entrez_search(db="pubmed", term=.x)$count),
          metabol_res = map_dbl(metabolomics_search, ~entrez_search(db="pubmed", term=.x)$count),
@@ -94,14 +102,15 @@ omics_search_counts %>%
 ```{r}
 readRDS("../Datasets/omics_search_counts.rds") %>% 
   filter(year >= 1991 ) %>% 
-  mutate(Microbiome = microb_res / all,
+  mutate(TumorLympho = tumlymph_res / all,
+         Microbiome = microb_res / all,
          Genomics = genom_res / all,
          Proteomics = proteo_res / all,
          Metabolomics = metabol_res / all,
          Lipidomics = lipid_res / all,
          Phenomics = pheno_res / all,
          Transcriptomics = transcr_res / all) %>%
-  select(year, Microbiome, Genomics, Proteomics, Metabolomics, Lipidomics, Phenomics, Transcriptomics) %>%
+  select(year, TumorLympho, Microbiome, Genomics, Proteomics, Metabolomics, Lipidomics, Phenomics, Transcriptomics) %>%
   pivot_longer(-year) %>%
   filter(value > 0) %>% 
   ggplot(aes(x=year, y=value, group=name, color=name)) +
@@ -111,7 +120,7 @@ readRDS("../Datasets/omics_search_counts.rds") %>%
                 labels=c("0", "0.1", "1", "10", "100")) +
   # scale_y_continuous(labels = scales::percent)
   scale_color_manual(name="Omics Type",
-                     values=c("maroon", "red","orange", "green","blue", "magenta", "purple")) +
+                     values=c("blue2", "maroon", "red","orange", "green","blue", "magenta", "purple")) +
   labs(x="Year", y="Percentage of all Papers in PubMed") +
   theme_classic() 
 

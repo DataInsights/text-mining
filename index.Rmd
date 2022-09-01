@@ -1,8 +1,8 @@
 ---
-title: "Text Mining in R"
-subtitle: "Searching and visually comparing different fields"
-author: "Teresia Mrema-Buza"
-date: "<strong>Last Updated</strong>: `r Sys.Date()`"
+title: "PubMed Article Searching"
+subtitle: "Practical user guides with integrated solutions"
+author: "Teresia Mrema-Buza, A Bioinformatics Scientist and Data Science Enthusiast"
+date: "Updated on `r Sys.Date()`"
 site: bookdown::bookdown_site
 knit: bookdown::render_book
 output:
@@ -24,9 +24,6 @@ output:
     split_bib: no
     df_print: paged
     number_sections: true
-    css:
-    - css/style.css
-    - style.css
     
   html_document:
     code_folding: hide
@@ -59,7 +56,7 @@ classoption: openany #remove empty pages in pdf doc
 bibliography:
 - library/book.bib
 - library/packages.bib
-- library/microbiome.bib
+- library/bibliograph.bib
 - library/software.bib 
 citation_package:
 - natbib
@@ -67,7 +64,8 @@ citation_package:
 - amsplain
 colorlinks: true
 css:
-- css/style.css
+  - css/style.css
+  - style.css
 always_allow_html: true
 fig_caption: true
 fontsize: 12pt
@@ -87,53 +85,63 @@ header-includes:
 - \renewenvironment{tmbalert}[0]{}{}
 - \newenvironment{tmbshare}[0]{}{}
 - \renewenvironment{tmbshare}[0]{}{}
-description: 
---
+description: |
+  This guide provides integrated and highly curated solutions for achieving better results.
+---
+
+
+```{r pkgbiblib, include=FALSE}
+# automatically create a bib database for R packages
+knitr::write_bib(c(.packages(), 'base','bookdown','rmarkdown','tidyverse'), 'library/packages.bib')
+```
 
 ```{r setup, include=FALSE}
-source("R/common.R")
-library(flexdashboard)
-library(tidyverse, suppressPackageStartupMessages())
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+
+## Create Object Folder 
+if (!dir.exists("RDataRDS")) {dir.create("RDataRDS")}
+
+# source(file = "R/common.R")
+
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  cache = FALSE,
+  comment = NA,
+  fig.path='./figures/',
+  fig.show='asis',
+  dev = 'png',
+  fig.align='center',
+  out.width = "80%",
+  out.height = "40%",
+  fig.width = 7,
+  fig.asp = 0.618,
+  fig.show = "asis"
+)
 ```
 
+# Getting Started with Literature Mining {-#frontpage}
 
-# Pubmed Literature Tracking in R
-```{r pubmed, fig.cap="PubMed Search Workflow"}
-library(DiagrammeR)
-library(DiagrammeRsvg)
+<br>
 
-mermaidgraph <- mermaid("graph TD
-A(OMICS PUBLICATION STATISTICS) --> A0{NCBI PubMed Database}
-A0 --> A1[Microbiome OR Metabolomics]
-A0 --> A2[Genomics]
-A0 --> A3[Proteomics]
-A0 --> A4[Metabolomics]
-A0 --> A5[Phenomics]
-A0 --> A6[Transcriptomics]
+<a href=""><img src="img/cover.gif" alt="Book cover" width="100%" style="padding: 50px 0px 50px 0px; float: right;"/></a>
 
+<br>
 
-subgraph ARTICLE SEARCH USING OMICS KEYWORDS
-A1 --> B{Indexed Papers in PubMed}
-A2 --> B
-A3 --> B
-A4 --> B
-A5 --> B
-A6 --> B
+## Quick Glimpse {-}
 
-B --> |Download results| C[Results by Year in CSV format]
-end
+<br>
 
-subgraph SEARCH RESULTS
-C --> |Filename| D[PubMed_Timeline_Results_by_Year.csv]
-D --> E[Save file in data directory]
-E -.-> F[Further Analysis]
-end
+## License {-}
 
-", height = 600, width = 600)
+![](global/CCbyNCND.png){ width=100px } The online version of this book is free and licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>. The code that built this guide is available at a private GitHub repository. A minimal code and quick description of the book is available at a public [GitHub Page](https://tmbuza.github.io/Systematic-Microbiome-Data-Analysis/). If interested you can obtain a more detailed copy from the [CDI LLC Store](https://complexdatainsights.com/products).
 
-mermaidgraph
-
-```
-
-
-
+## Structure of this guide {-}
+This guide is divided into chapters to facilitate easy navigation. Each chapter contains several sections as displayed in the navigation bars on the left and right. Click the hyper-linked text if you want to jump into a specific chapter or section.
