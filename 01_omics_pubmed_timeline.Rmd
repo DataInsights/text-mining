@@ -1,3 +1,5 @@
+# (PART) PUBLICATION STATS {-}
+
 ## Creating objects for search terms
 ```{r}
 tic()
