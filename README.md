@@ -1,1 +1,1 @@
-# Searching Pubamed Articles
+# Searching PubMed Articles
