@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ## RDS Format for Individual Object
 ```{r}
 
-rds <- list.files(path="./RDataRDS", pattern = "*.rds", full.names = TRUE)
+rds <- list.files(path="./data", pattern = "*.rds", full.names = TRUE)
 rds
 
 ```
@@ -18,7 +18,7 @@ rds
 ## RData Format for Multiple Objects
 ```{r}
 
-rdata <- list.files(path="./RDataRDS", pattern = "*.RData", full.names = TRUE)
+rdata <- list.files(path="./data", pattern = "*.RData", full.names = TRUE)
 rdata
 
 ```
@@ -27,25 +27,24 @@ rdata
 ## CSV or TSV Format Files
 ```{r}
 
-list.files(path="./RDataRDS", pattern = "*.csv|tsv", full.names = TRUE)
+list.files(path="./data", pattern = "*.csv|tsv", full.names = TRUE)
 
 ```
 
 
 ```{r eval=FALSE, include=FALSE}
 ## All-in-One Input-Output Data
-lsdata("RDataRDS/saved_objects.RData")
+lsdata("data/saved_objects.RData")
 ```
-
 
 
 ## How to reload RDS or RData
 ```{block, type="tmbinfo", echo=T}
 ### RDS format e.g. foo.rds
-foo <-`readRDS("RDataRDS/foo.rds")`
+foo <-`readRDS("data/foo.rds")`
 
 ### RData format e.g. foo.RData
-`load("RDataRDS/foo.RData", verbose = TRUE)`
+`load("data/foo.RData", verbose = TRUE)`
 
 ### List objects in RData
 `lsdata("foo.RData")`
@@ -62,11 +61,9 @@ foo <-`readRDS("RDataRDS/foo.rds")`
 * `rmarkdown` (v. `r packageVersion("rmarkdown")`)
 * `bookdown` (v. `r packageVersion("bookdown")`)
 
-
 ## Available on machine used 
 ```{r}
 sessionInfo()
-
 ```
 
 

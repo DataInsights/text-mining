@@ -1,68 +1,8 @@
-# (PART) PUBMED TRACKING {-}
-
-# Searching and Tracking PubMed
-
-## Manual download from PubMed 
+## Creating objects for search terms
 ```{r}
-library(tidyverse)
-
-tumorlympho <- read_csv("data/Cancer_PubMed_Timeline_Results_by_Year.csv",
-         skip=1, show_col_types = F) %>% 
-  filter(Year != 2023) %>% 
-  mutate(Omics = "TumorLympho")
-
-microbiome <- read_csv("../Datasets/microbiome_metagenomic_PubMed_Timeline.csv",
-         skip=1, show_col_types = F) %>% 
-  filter(Year != 2023) %>% 
-  mutate(Omics = "Microbiome")
-
-genomics <- read_csv("../Datasets/genomics_PubMed_Timeline.csv",
-         skip=1, show_col_types = F) %>% 
-  filter(Year != 2023) %>% 
-  mutate(Omics = "Genomics")
-
-metabolomics <- read_csv("../Datasets/metabolomics_PubMed_Timeline.csv",
-         skip=1, show_col_types = F) %>% 
-  filter(Year != 2023) %>% 
-  mutate(Omics = "Metabolomics")
-
-proteomics <- read_csv("../Datasets/proteomics_PubMed_Timeline.csv",
-         skip=1, show_col_types = F) %>% 
-  filter(Year != 2023) %>% 
-  mutate(Omics = "Proteomics")
-
-phenomics <- read_csv("../Datasets/phenomics_PubMed_Timeline.csv",
-         skip=1, show_col_types = F) %>% 
-  filter(Year != 2023) %>% 
-  mutate(Omics = "Phenomics")
-
-lipidomics <- read_csv("../Datasets/lipidomics_PubMed_Timeline.csv",
-         skip=1, show_col_types = F) %>% 
-  filter(Year != 2023) %>% 
-  mutate(Omics = "Lipidomics")
-
-transcriptomics <- read_csv("../Datasets/transcriptomics_PubMed_Timeline.csv",
-         skip=1, show_col_types = F) %>% 
-  filter(Year != 2023) %>% 
-  mutate(Omics = "Transcriptomics")
-
-do.call("rbind", list(tumorlympho, microbiome, genomics, metabolomics, proteomics, phenomics, lipidomics, transcriptomics)) %>% 
-  write_csv("../Datasets/omics_pubmed_timeline.csv")
-
-read_csv("../Datasets/omics_pubmed_timeline.csv") %>% 
-  ggplot(aes(x=Year, y=Count, color = Omics)) +
-  geom_line() +
-  theme_classic()
-```
-
-
-## Using `rentrez` package
-```{r eval=FALSE, echo=TRUE}
-library(rentrez)
-library(glue)
+tic()
 
 year <- 1991:2022
-tumorlympho_search <- glue("cancer OR tumor AND lymphocyte AND {year}[PDAT]")
 microbiome_search <- glue("microbiome OR metagenomics OR metagenome AND {year}[PDAT]")
 genomics_search <- glue("genomics AND {year}[PDAT]")
 proteomics_search <- glue("proteomics AND {year}[PDAT]")
@@ -70,11 +10,13 @@ metabolomics_search <- glue("metabolomics AND {year}[PDAT]")
 lipidomics_search <- glue("lipidomics AND {year}[PDAT]")
 phenomics_search <- glue("phenomics AND {year}[PDAT]")
 transcriptomics_search <- glue("transcriptomics AND {year}[PDAT]")
-
 all_search <- glue("{year}[PDAT]")
+```
 
+
+## Getting search counts
+```{r}
 omics_search_counts <- tibble(year = year,
-       tumorlympho_search = tumorlympho_search,
        microbiome_search = microbiome_search,
        genomics_search = genomics_search,
        proteomics_search = proteomics_search,
@@ -83,7 +25,7 @@ omics_search_counts <- tibble(year = year,
        phenomics_search = phenomics_search,
        transcriptomics_search = transcriptomics_search,
        all_search = all_search) %>%
-  mutate(tumlymph_res = map_dbl(tumorlympho_search, ~entrez_search(db="pubmed", term=.x)$count),
+  mutate(
          microb_res = map_dbl(microbiome_search, ~entrez_search(db="pubmed", term=.x)$count),
          genom_res = map_dbl(genomics_search, ~entrez_search(db="pubmed", term=.x)$count),
          proteo_res = map_dbl(proteomics_search, ~entrez_search(db="pubmed", term=.x)$count),
@@ -91,39 +33,41 @@ omics_search_counts <- tibble(year = year,
          lipid_res = map_dbl(lipidomics_search, ~entrez_search(db="pubmed", term=.x)$count),
          pheno_res = map_dbl(phenomics_search, ~entrez_search(db="pubmed", term=.x)$count),
          transcr_res = map_dbl(transcriptomics_search, ~entrez_search(db="pubmed", term=.x)$count),
-         all = map_dbl(all_search, ~entrez_search(db="pubmed", term=.x)$count)
+         all_res = map_dbl(all_search, ~entrez_search(db="pubmed", term=.x)$count)
          ) 
 
+# save results in an R object
 omics_search_counts %>% 
-  saveRDS("../Datasets/omics_search_counts.rds")
+  saveRDS("data/omics_search_counts.rds")
 ```
 
-## Compare Omics publications
+
+## Plotting the results 
 ```{r}
-readRDS("../Datasets/omics_search_counts.rds") %>% 
+readRDS("data/omics_search_counts.rds") %>% 
   filter(year >= 1991 ) %>% 
-  mutate(TumorLympho = tumlymph_res / all,
-         Microbiome = microb_res / all,
-         Genomics = genom_res / all,
-         Proteomics = proteo_res / all,
-         Metabolomics = metabol_res / all,
-         Lipidomics = lipid_res / all,
-         Phenomics = pheno_res / all,
-         Transcriptomics = transcr_res / all) %>%
-  select(year, TumorLympho, Microbiome, Genomics, Proteomics, Metabolomics, Lipidomics, Phenomics, Transcriptomics) %>%
+  mutate(
+         Microbiome = microb_res / all_res,
+         Genomics = genom_res / all_res,
+         Proteomics = proteo_res / all_res,
+         Metabolomics = metabol_res / all_res,
+         Lipidomics = lipid_res / all_res,
+         Phenomics = pheno_res / all_res,
+         Transcriptomics = transcr_res / all_res) %>%
+  select(year, Microbiome, Genomics, Proteomics, Metabolomics, Lipidomics, Phenomics, Transcriptomics) %>%
   pivot_longer(-year) %>%
   filter(value > 0) %>% 
-  ggplot(aes(x=year, y=value, group=name, color=name)) +
-  geom_line(size=1) +
-  scale_y_log10(limits=c(NA, 100),
-                breaks=c(0, 0.1, 1, 10, 100),
-                labels=c("0", "0.1", "1", "10", "100")) +
-  # scale_y_continuous(labels = scales::percent)
-  scale_color_manual(name="Omics Type",
-                     values=c("blue2", "maroon", "red","orange", "green","blue", "magenta", "purple")) +
-  labs(x="Year", y="Percentage of all Papers in PubMed") +
+  
+  ggplot(aes(x = year, y = value, group = name, color = name)) +
+  geom_line(size = 1) +
+
+  scale_color_manual(name = "Omics Type",
+                     values = c("blue2", "maroon", "red","orange", "green", "magenta", "purple")) +
+  labs(x = "Year", y = "Percentage of all Papers in PubMed") +
   theme_classic() 
 
-ggsave("figures/omics_compare.png", width=6, height=4)
+ggsave("figures/omics_compare.png", width = 6, height = 4)
+
+toc() # time to run
 ```
 

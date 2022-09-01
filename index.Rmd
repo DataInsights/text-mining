@@ -1,7 +1,7 @@
 ---
-title: "PubMed Article Searching"
-subtitle: "Practical user guides with integrated solutions"
-author: "Teresia Mrema-Buza, A Bioinformatics Scientist and Data Science Enthusiast"
+title: "PubMed Article Searching in R"
+subtitle: "A simple practical user guides for publication statistics"
+author: "Teresia Mrema-Buza, A Bioinformatics and Data Science Enthusiast"
 date: "Updated on `r Sys.Date()`"
 site: bookdown::bookdown_site
 knit: bookdown::render_book
@@ -24,47 +24,17 @@ output:
     split_bib: no
     df_print: paged
     number_sections: true
-    
-  html_document:
-    code_folding: hide
-    
-  bookdown::html_document2:
-    code_folding: hide
-    
-  bookdown::pdf_book:
-    config:
-      toc = true
-      toc_depth = 2
-      number_sections = true
-      fig_caption = true
-      keep_tex = no
-      pandoc_args = null
-      toc_unnumbered = no
-      toc_appendix = no
-      toc_bib = no 
-      quote_footer = null
-      highlight_bw = true
-      latex_engine = xelatex
-      df_print = kable
-      base_format = rmarkdown::pdf_document
-  includes:
-    in_header: 
-    - latex/header.tex
-    - latex/preamble.tex
 documentclass: book
-classoption: openany #remove empty pages in pdf doc
+classoption: openany
 bibliography:
-- library/book.bib
 - library/packages.bib
 - library/bibliograph.bib
-- library/software.bib 
 citation_package:
 - natbib
 - biblatex
 - amsplain
 colorlinks: true
 css:
-  - css/style.css
   - style.css
 always_allow_html: true
 fig_caption: true
@@ -76,24 +46,10 @@ link-citations: true
 mainfont: Times New Roman
 biblio-style: apalike
 spacing: double
-header-includes: 
-- \usepackage{setspace}
-- \newpage
-- \newenvironment{tmbinfo}[0]{}{}
-- \renewenvironment{tmbinfo}[0]{}{}
-- \newenvironment{tmbalert}[0]{}{}
-- \renewenvironment{tmbalert}[0]{}{}
-- \newenvironment{tmbshare}[0]{}{}
-- \renewenvironment{tmbshare}[0]{}{}
 description: |
   This guide provides integrated and highly curated solutions for achieving better results.
 ---
 
-
-```{r pkgbiblib, include=FALSE}
-# automatically create a bib database for R packages
-knitr::write_bib(c(.packages(), 'base','bookdown','rmarkdown','tidyverse'), 'library/packages.bib')
-```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -103,14 +59,16 @@ knitr::opts_chunk$set(
 )
 
 ## Create Object Folder 
-if (!dir.exists("RDataRDS")) {dir.create("RDataRDS")}
+if (!dir.exists("library")) {dir.create("library")}
+if (!dir.exists("data")) {dir.create("data")}
+if (!file.exists("library/bibliograph.bib")) {file.create("library/bibliograph.bib")}
 
 # source(file = "R/common.R")
 
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 
 knitr::opts_chunk$set(
-  echo = TRUE,
+  echo = FALSE,
   message = FALSE,
   warning = FALSE,
   cache = FALSE,
@@ -127,21 +85,48 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Getting Started with Literature Mining {-#frontpage}
+# Getting Started withSearching PubMed Articles {#pubmed-search}
 
-<br>
+```{r pkgbiblib, include=FALSE}
+knitr::write_bib(c(.packages(), 'base','bookdown','rmarkdown','tidyverse'), 'library/packages.bib')
+```
 
-<a href=""><img src="img/cover.gif" alt="Book cover" width="100%" style="padding: 50px 0px 50px 0px; float: right;"/></a>
 
-<br>
+## Load libraries
+```{r}
+library(rentrez)
+library(glue)
+library(tidyverse, suppressPackageStartupMessages)
+library(DiagrammeR)
+library(DiagrammeRsvg)
+```
 
-## Quick Glimpse {-}
+## Manual search workflow
+```{r workflow}
+mermaidgraph <- mermaid("graph TD
 
-<br>
+subgraph SEARCHING PUBMED DATABASE
+A[NCBI PubMed Database<br>https://pubmed.ncbi.nlm.nih.gov/] --> B[Search Term]
+B --> |Search Results| C[Indexed Papers in PubMed]
+end
+subgraph SEARCH RESULTS
+C --> |Download results| D{Results by Year in CSV format}
+D --> |Filename| E[PubMed_Timeline_Results_by_Year.csv]
+E --> F[Save file in data directory]
+end
 
-## License {-}
+F -.-> G[Further Analysis in R or Python]
 
-![](global/CCbyNCND.png){ width=100px } The online version of this book is free and licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>. The code that built this guide is available at a private GitHub repository. A minimal code and quick description of the book is available at a public [GitHub Page](https://tmbuza.github.io/Systematic-Microbiome-Data-Analysis/). If interested you can obtain a more detailed copy from the [CDI LLC Store](https://complexdatainsights.com/products).
+", height = 500, width = 300)
 
-## Structure of this guide {-}
-This guide is divided into chapters to facilitate easy navigation. Each chapter contains several sections as displayed in the navigation bars on the left and right. Click the hyper-linked text if you want to jump into a specific chapter or section.
+mermaidgraph
+
+```
+
+
+## Code availability {-}
+The code that generated this guide is available at a public [GitHub repository](https://github.com/DataInsights/pubmed-tracking/) or via a [GH-Page](https://DataInsights.github.io/pubmed-tracking/).
+
+
+
+
