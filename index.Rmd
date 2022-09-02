@@ -99,6 +99,7 @@ library(glue)
 library(tidyverse, suppressPackageStartupMessages)
 library(DiagrammeR)
 library(DiagrammeRsvg)
+library(tictoc)
 ```
 
 ## Manual search workflow

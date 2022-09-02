@@ -8,8 +8,7 @@ output_dir:
 rmd_files: [
 "index.Rmd",
 "01_omics_pubmed_timeline.Rmd",
-# "01_pubmed_literature.Rmd",
-# "02_articles_summarization.Rmd",
+"02_articles_summarization.Rmd",
 # "03_section_word_count.Rmd",
 "99_appendix.Rmd",
 "999-references.Rmd"
